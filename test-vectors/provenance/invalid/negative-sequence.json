@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "description": "Provenance entry with negative sequence number",
+    "expected_result": "invalid",
+    "expected_error": "INVALID_SEQUENCE",
+    "spec_reference": "spec/003-provenance-record.md Section 2.2.3 - Zero-indexed position"
+  },
+  "data": {
+    "entryId": "prov:chain001:entry:-1",
+    "chainId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "sequence": -1,
+    "timestamp": "2026-01-28T00:00:00.000Z",
+    "eventType": "ASSET_ACCESSED",
+    "actor": {
+      "id": "researcher:bob",
+      "type": "RESEARCHER"
+    },
+    "subject": {
+      "type": "HEALTH_ASSET",
+      "id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"
+    },
+    "details": {},
+    "previousHash": null,
+    "entryHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "signature": {
+      "algorithm": "ED25519",
+      "publicKeyId": "did:haven:bob#key-1",
+      "value": "MEUCIQDxSample",
+      "signedAt": "2026-01-28T00:00:00.000Z"
+    }
+  }
+}

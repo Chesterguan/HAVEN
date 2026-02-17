@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "description": "Valid ASSET_CREATED provenance entry",
+    "expected_result": "valid",
+    "spec_reference": "spec/003-provenance-record.md Section 2.2.7"
+  },
+  "data": {
+    "entryId": "prov:chain001:entry:42",
+    "chainId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "sequence": 42,
+    "timestamp": "2026-01-28T10:30:00.000Z",
+    "eventType": "ASSET_CREATED",
+    "actor": {
+      "id": "patient:alice-12345",
+      "type": "PATIENT"
+    },
+    "subject": {
+      "type": "HEALTH_ASSET",
+      "id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"
+    },
+    "details": {
+      "assetId": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730",
+      "substrate": "FHIR-R4",
+      "qualityClass": "A",
+      "consentRef": "consent:550e8400-e29b-41d4-a716-446655440000",
+      "sourceSystem": "epic-mychart"
+    },
+    "previousHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "entryHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "signature": {
+      "algorithm": "ED25519",
+      "publicKeyId": "did:haven:alice#key-1",
+      "value": "MEUCIQDxSampleAssetCreatedSignature",
+      "signedAt": "2026-01-28T10:30:00.000Z"
+    }
+  }
+}

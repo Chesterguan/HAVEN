@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "description": "Health Asset with OMOP CDM 5.4 substrate",
+    "expected_result": "valid",
+    "spec_reference": "spec/001-health-asset.md Section 2.2.3"
+  },
+  "data": {
+    "asset_id": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data_ref": "omop://ohdsi.network/person/12345/condition_occurrence/67890",
+    "substrate": "OMOP-CDM-5.4",
+    "consent_ref": "consent:a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "quality_class": "A",
+    "provenance_ref": "prov:chain003:entry:100",
+    "patient_ref": "patient:charlie-11111",
+    "created_at": "2026-01-15T08:00:00.000Z",
+    "metadata": {
+      "dataType": "CONDITIONS",
+      "recordCount": 23
+    }
+  }
+}

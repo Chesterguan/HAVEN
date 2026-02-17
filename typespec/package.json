@@ -1,0 +1,24 @@
+{
+  "name": "@haven/protocol-types",
+  "version": "2.0.0",
+  "description": "HAVEN Protocol type definitions in TypeSpec",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsp compile .",
+    "watch": "tsp compile . --watch",
+    "format": "tsp format **/*.tsp",
+    "clean": "rm -rf ../generated/*"
+  },
+  "dependencies": {
+    "@typespec/compiler": "^0.60.0",
+    "@typespec/http": "^0.60.0",
+    "@typespec/openapi3": "^0.60.0",
+    "@typespec/json-schema": "^0.60.0",
+    "@typespec/rest": "^0.60.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

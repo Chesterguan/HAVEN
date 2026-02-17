@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "description": "Valid cohort query contribution with structured data",
+    "expected_result": "valid",
+    "spec_reference": "spec/004-contribution-model.md Section 13.2"
+  },
+  "data": {
+    "contributionId": "contrib:9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
+    "patientId": "patient:bob-67890",
+    "assetRefs": [
+      "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    ],
+    "qualityScore": 0.8,
+    "tier": "STRUCTURED",
+    "context": {
+      "contextId": "ctx:query-789",
+      "contextType": "COHORT_QUERY",
+      "queryRef": "query:eligibility-screen-2026-01",
+      "purpose": "RESEARCH",
+      "timestamp": "2026-01-28T09:15:00.000Z"
+    },
+    "rawValue": 0.16,
+    "timestamp": "2026-01-28T09:15:00.000Z",
+    "provenanceRef": "prov:chain002:entry:42"
+  }
+}

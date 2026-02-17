@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "description": "Consent with invalid status value",
+    "expected_result": "invalid",
+    "expected_error": "INVALID_ENUM_VALUE",
+    "spec_reference": "spec/002-consent-protocol.md Section 2.2.7"
+  },
+  "data": {
+    "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+    "grantor": {
+      "id": "patient:alice-12345",
+      "type": "HAVEN_ID"
+    },
+    "grantee": {
+      "id": "study:test-study",
+      "type": "STUDY",
+      "name": "Test Study"
+    },
+    "scope": {
+      "resourceTypes": ["Observation"]
+    },
+    "purpose": ["RESEARCH"],
+    "granted_at": "2026-01-28T10:30:00.000Z",
+    "status": "INVALID_STATUS",
+    "signature": {
+      "algorithm": "ED25519",
+      "publicKeyId": "did:haven:alice#key-1",
+      "value": "MEUCIQDxSampleValue",
+      "signedAt": "2026-01-28T10:30:00.000Z"
+    }
+  }
+}

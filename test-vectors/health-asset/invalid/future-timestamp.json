@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "description": "Health Asset with future timestamp",
+    "expected_result": "invalid",
+    "expected_error": "INVALID_TIMESTAMP",
+    "spec_reference": "spec/001-health-asset.md Section 2.2.8 - MUST NOT be in the future"
+  },
+  "data": {
+    "asset_id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730",
+    "data_ref": "fhir://ehr.hospital.org/Observation/bp-123",
+    "substrate": "FHIR-R4",
+    "consent_ref": "consent:550e8400-e29b-41d4-a716-446655440000",
+    "quality_class": "A",
+    "provenance_ref": "prov:chain001:entry:001",
+    "patient_ref": "patient:alice-12345",
+    "created_at": "2030-12-31T23:59:59.999Z"
+  }
+}

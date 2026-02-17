@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "description": "Valid research study contribution with longitudinal data",
+    "expected_result": "valid",
+    "spec_reference": "spec/004-contribution-model.md Section 13.1"
+  },
+  "data": {
+    "contributionId": "contrib:7f3d2a1b-8c4e-5f6a-9b0c-1d2e3f4a5b6c",
+    "patientId": "patient:alice-12345",
+    "assetRefs": [
+      "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    ],
+    "qualityScore": 1.0,
+    "tier": "LONGITUDINAL",
+    "context": {
+      "contextId": "ctx:study-001-alice",
+      "contextType": "RESEARCH_STUDY",
+      "studyRef": "study:diabetes-cgm-2026",
+      "purpose": "RESEARCH",
+      "timestamp": "2026-01-28T14:30:00.000Z"
+    },
+    "rawValue": 0.735,
+    "timestamp": "2026-01-28T14:30:00.000Z",
+    "provenanceRef": "prov:chain001:entry:150",
+    "metadata": {
+      "recordCount": 885,
+      "timeSpanDays": 1095,
+      "dataTypes": ["LABORATORY", "CONDITIONS", "MEDICATIONS"]
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "_meta": {
+    "description": "Genesis entry with non-null previous_hash (must be null)",
+    "expected_result": "invalid",
+    "expected_error": "INVALID_GENESIS",
+    "spec_reference": "spec/003-provenance-record.md Section 3.1 - previous_hash MUST be null for genesis"
+  },
+  "data": {
+    "entryId": "prov:chain001:entry:0",
+    "chainId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "sequence": 0,
+    "timestamp": "2026-01-28T00:00:00.000Z",
+    "eventType": "SYSTEM_AUDIT",
+    "actor": {
+      "id": "system:haven",
+      "type": "SYSTEM"
+    },
+    "subject": {
+      "type": "PATIENT",
+      "id": "patient:alice-12345"
+    },
+    "details": {
+      "event": "CHAIN_CREATED"
+    },
+    "previousHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "entryHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "signature": {
+      "algorithm": "ED25519",
+      "publicKeyId": "did:haven:system#key-1",
+      "value": "MEUCIQDxSample",
+      "signedAt": "2026-01-28T00:00:00.000Z"
+    }
+  }
+}

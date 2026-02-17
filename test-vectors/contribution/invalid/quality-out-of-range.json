@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "description": "Contribution with quality score out of valid range",
+    "expected_result": "invalid",
+    "expected_error": "VALUE_OUT_OF_RANGE",
+    "spec_reference": "spec/004-contribution-model.md Section 2.2.4 - Range [0.0, 1.0]"
+  },
+  "data": {
+    "contributionId": "contrib:eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+    "patientId": "patient:charlie-11111",
+    "assetRefs": [
+      "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    ],
+    "qualityScore": 1.5,
+    "tier": "STRUCTURED",
+    "context": {
+      "contextId": "ctx:test-001",
+      "contextType": "RESEARCH_STUDY",
+      "purpose": "RESEARCH",
+      "timestamp": "2026-01-28T10:00:00.000Z"
+    },
+    "rawValue": 0.5,
+    "timestamp": "2026-01-28T10:00:00.000Z",
+    "provenanceRef": "prov:chain003:entry:10"
+  }
+}

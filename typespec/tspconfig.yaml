@@ -1,0 +1,22 @@
+# TypeSpec configuration for HAVEN Protocol
+# Generates JSON Schema and OpenAPI from type definitions
+
+emit:
+  - "@typespec/json-schema"
+  - "@typespec/openapi3"
+
+options:
+  "@typespec/json-schema":
+    emitter-output-dir: "{output-dir}/json-schema"
+    bundleId: "haven-protocol"
+
+  "@typespec/openapi3":
+    emitter-output-dir: "{output-dir}/openapi"
+    output-file: "haven-api.yaml"
+
+output-dir: "../generated"
+
+# Linting options
+linter:
+  extends:
+    - "@typespec/http/recommended"

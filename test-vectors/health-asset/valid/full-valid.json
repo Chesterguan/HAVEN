@@ -1,0 +1,31 @@
+{
+  "_meta": {
+    "description": "Full Health Asset with all optional fields populated",
+    "expected_result": "valid",
+    "spec_reference": "spec/001-health-asset.md Section 2.1"
+  },
+  "data": {
+    "asset_id": "sha256:2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+    "data_ref": "omop://research-cdm.org/measurement/bulk/2026-01",
+    "substrate": "OMOP-CDM-6.0",
+    "consent_ref": "consent:6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "quality_class": "B",
+    "provenance_ref": "prov:chain002:entry:047",
+    "patient_ref": "patient:bob-67890",
+    "created_at": "2026-01-28T14:45:30.123Z",
+    "metadata": {
+      "sourceSystem": "epic-mychart-2024",
+      "dataType": "LABORATORY",
+      "recordCount": 847,
+      "timeRange": {
+        "start": "2023-01-01T00:00:00.000Z",
+        "end": "2025-12-31T23:59:59.999Z"
+      },
+      "version": "1.0.0",
+      "tags": ["diabetes", "cgm", "research-cohort"],
+      "extensions": {
+        "custom_field": "custom_value"
+      }
+    }
+  }
+}

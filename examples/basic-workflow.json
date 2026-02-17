@@ -1,0 +1,224 @@
+{
+  "_meta": {
+    "description": "Example of a complete HAVEN workflow from data ingestion to contribution",
+    "date": "2026-01-28",
+    "version": "2.0.0"
+  },
+
+  "scenario": "Patient Alice connects her health records, grants consent to a diabetes study, and her contribution is tracked",
+
+  "steps": [
+    {
+      "step": 1,
+      "name": "Patient Identity Setup",
+      "description": "Alice authenticates and receives a HAVEN identity",
+      "patient_identity": {
+        "id": "patient:alice-12345",
+        "type": "HAVEN_ID",
+        "verification": "AUTHENTICATED"
+      }
+    },
+    {
+      "step": 2,
+      "name": "Provenance Chain Creation",
+      "description": "A new provenance chain is created for Alice",
+      "provenance_entry": {
+        "entryId": "prov:chain001:entry:0",
+        "chainId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "sequence": 0,
+        "eventType": "SYSTEM_AUDIT",
+        "actor": {"id": "system:haven", "type": "SYSTEM"},
+        "subject": {"type": "PATIENT", "id": "patient:alice-12345"},
+        "details": {"event": "CHAIN_CREATED"},
+        "previousHash": null
+      }
+    },
+    {
+      "step": 3,
+      "name": "Health Asset Creation",
+      "description": "Alice's lab results are ingested and become a Health Asset",
+      "health_asset": {
+        "asset_id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730",
+        "data_ref": "fhir://ehr.hospital.org/Observation/labs-bundle-alice",
+        "substrate": "FHIR-R4",
+        "consent_ref": "consent:550e8400-e29b-41d4-a716-446655440000",
+        "quality_class": "A",
+        "provenance_ref": "prov:chain001:entry:1",
+        "patient_ref": "patient:alice-12345",
+        "created_at": "2026-01-28T10:00:00.000Z",
+        "metadata": {
+          "sourceSystem": "epic-mychart",
+          "dataType": "LABORATORY",
+          "recordCount": 150,
+          "timeRange": {
+            "start": "2023-01-01T00:00:00.000Z",
+            "end": "2026-01-28T00:00:00.000Z"
+          }
+        }
+      },
+      "provenance_entry": {
+        "entryId": "prov:chain001:entry:1",
+        "eventType": "ASSET_CREATED",
+        "details": {
+          "assetId": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730",
+          "substrate": "FHIR-R4",
+          "qualityClass": "A"
+        }
+      }
+    },
+    {
+      "step": 4,
+      "name": "Consent Grant",
+      "description": "Alice grants consent to the Diabetes CGM Study",
+      "consent_attestation": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "grantor": {
+          "id": "patient:alice-12345",
+          "type": "HAVEN_ID",
+          "verification": "AUTHENTICATED"
+        },
+        "grantee": {
+          "id": "study:diabetes-cgm-2026",
+          "type": "STUDY",
+          "name": "Diabetes CGM Outcomes Study",
+          "organization": "Stanford Medicine"
+        },
+        "scope": {
+          "resourceTypes": ["Observation.laboratory", "Condition", "MedicationRequest"],
+          "exclusions": ["Observation.mental_health", "Note"],
+          "timeRange": {"start": "2020-01-01T00:00:00.000Z", "end": null}
+        },
+        "purpose": ["RESEARCH"],
+        "conditions": [
+          {"type": "MIN_COHORT_SIZE", "parameters": {"minimum": 50}},
+          {"type": "NO_REIDENTIFICATION", "parameters": {"prohibition": "ABSOLUTE"}}
+        ],
+        "granted_at": "2026-01-28T10:30:00.000Z",
+        "expires_at": "2027-01-28T10:30:00.000Z",
+        "status": "ACTIVE"
+      },
+      "provenance_entry": {
+        "entryId": "prov:chain001:entry:2",
+        "eventType": "CONSENT_GRANTED",
+        "details": {
+          "consentId": "550e8400-e29b-41d4-a716-446655440000",
+          "grantee": "study:diabetes-cgm-2026",
+          "scopeSummary": "Labs, Conditions, Medications (2020-present)"
+        }
+      }
+    },
+    {
+      "step": 5,
+      "name": "Data Access (Consent Verification)",
+      "description": "Researcher requests access; consent is verified",
+      "verify_request": {
+        "consentId": "550e8400-e29b-41d4-a716-446655440000",
+        "accessor": {
+          "id": "researcher:bob@stanford.edu",
+          "type": "RESEARCHER",
+          "name": "Dr. Bob Smith"
+        },
+        "requestedScope": {
+          "resourceTypes": ["Observation.laboratory"]
+        },
+        "requestedPurpose": "RESEARCH"
+      },
+      "verify_result": {
+        "authorized": true,
+        "consentStatus": "ACTIVE",
+        "scopeMatch": {
+          "fullMatch": true,
+          "coveredTypes": ["Observation.laboratory"],
+          "uncoveredTypes": []
+        },
+        "purposeMatch": true,
+        "conditionsMet": [
+          {"conditionType": "MIN_COHORT_SIZE", "satisfied": true, "details": "Cohort has 127 patients"},
+          {"conditionType": "NO_REIDENTIFICATION", "satisfied": true, "details": "Attestation signed"}
+        ]
+      },
+      "provenance_entry": {
+        "entryId": "prov:chain001:entry:3",
+        "eventType": "CONSENT_VERIFIED",
+        "actor": {"id": "researcher:bob@stanford.edu", "type": "RESEARCHER"},
+        "details": {
+          "consentId": "550e8400-e29b-41d4-a716-446655440000",
+          "authorized": true
+        }
+      }
+    },
+    {
+      "step": 6,
+      "name": "Data Access (Asset Read)",
+      "description": "Researcher accesses Alice's authorized data",
+      "provenance_entry": {
+        "entryId": "prov:chain001:entry:4",
+        "eventType": "ASSET_ACCESSED",
+        "actor": {"id": "researcher:bob@stanford.edu", "type": "RESEARCHER"},
+        "subject": {
+          "type": "HEALTH_ASSET",
+          "id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"
+        },
+        "details": {
+          "consentRef": "consent:550e8400-e29b-41d4-a716-446655440000",
+          "accessType": "READ",
+          "purpose": "RESEARCH",
+          "fieldsAccessed": ["Observation.laboratory"]
+        }
+      }
+    },
+    {
+      "step": 7,
+      "name": "Contribution Recording",
+      "description": "Alice's contribution to the study is recorded",
+      "contribution": {
+        "contributionId": "contrib:7f3d2a1b-8c4e-5f6a-9b0c-1d2e3f4a5b6c",
+        "patientId": "patient:alice-12345",
+        "assetRefs": ["sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"],
+        "qualityScore": 1.0,
+        "tier": "LONGITUDINAL",
+        "context": {
+          "contextId": "ctx:study-001-alice",
+          "contextType": "RESEARCH_STUDY",
+          "studyRef": "study:diabetes-cgm-2026",
+          "purpose": "RESEARCH",
+          "timestamp": "2026-01-28T14:30:00.000Z"
+        },
+        "rawValue": 0.735,
+        "timestamp": "2026-01-28T14:30:00.000Z",
+        "provenanceRef": "prov:chain001:entry:5",
+        "metadata": {
+          "recordCount": 150,
+          "timeSpanDays": 1095,
+          "dataTypes": ["LABORATORY"]
+        }
+      },
+      "value_calculation": {
+        "tierWeight": 0.75,
+        "qualityScore": 1.0,
+        "volumeNorm": 0.98,
+        "contextMultiplier": 1.0,
+        "formula": "0.75 × 1.0 × 0.98 × 1.0 = 0.735"
+      },
+      "provenance_entry": {
+        "entryId": "prov:chain001:entry:5",
+        "eventType": "CONTRIBUTION_RECORDED",
+        "details": {
+          "contributionId": "contrib:7f3d2a1b-8c4e-5f6a-9b0c-1d2e3f4a5b6c",
+          "studyRef": "study:diabetes-cgm-2026",
+          "rawValue": 0.735,
+          "tier": "LONGITUDINAL"
+        }
+      }
+    }
+  ],
+
+  "summary": {
+    "patient": "Alice",
+    "assets_created": 1,
+    "consents_granted": 1,
+    "data_accesses": 1,
+    "total_contribution_value": 0.735,
+    "provenance_entries": 6
+  }
+}

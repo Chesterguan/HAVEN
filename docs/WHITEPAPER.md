@@ -1,16 +1,22 @@
-# HAVEN: A Protocol for Patient-Sovereign Health Data
+# HAVEN: A Value Exchange Protocol for Patient Health Data
 
-**Version 2.0 | January 2026**
+**Version 2.0 | February 2026**
 
 ---
 
 ## Abstract
 
-HAVEN (Health Asset Value & Exchange Network) is a protocol for patient-sovereign biomedical data. It defines four core primitives: **Health Assets** (content-addressed governed data objects), **Consent Protocol** (programmable authorization with deterministic evaluation), **Provenance Record** (hash-chained audit trail), and **Contribution Model** (quality-weighted value quantification).
+HAVEN is a protocol for patient-controlled health data. It specifies how data gets referenced, consented, audited, and valued. It says nothing about how you store data, run computations, or handle payments.
 
-HAVEN builds on established standards (HL7 FHIR R4, OHDSI OMOP CDM) and leaves implementation choices (storage backend, compute model, user interface) to adopters. The protocol specifies cryptographic integrity guarantees, consent verification semantics, and interoperability requirements while remaining agnostic to deployment architecture.
+The protocol has four parts:
+- **Health Assets**: Smart pointers to clinical data with built-in governance
+- **Consent Protocol**: Machine-executable authorization that patients actually control
+- **Provenance Record**: An audit trail nobody can tamper with
+- **Contribution Model**: A way to measure what patient data is worth
 
-This whitepaper specifies what HAVEN defines and what it deliberately leaves to implementations.
+We build on FHIR and OMOP because they already work. We leave storage, compute, and economics to implementers because one size won't fit all.
+
+This document explains what HAVEN specifies—and what it deliberately leaves open.
 
 ---
 
@@ -31,11 +37,15 @@ This whitepaper specifies what HAVEN defines and what it deliberately leaves to 
 
 ## 1. Introduction
 
-Biomedical data is becoming the primary input for AI systems that will shape medicine's future. Foundation models trained on clinical records already exceed human specialists in narrow domains.
+Every blood test, imaging scan, and clinical note you generate becomes training data for AI systems you'll never see. Foundation models are learning medicine from patient records—often exceeding human specialists in narrow tasks—while the people whose bodies produced that data have no say in how it's used.
 
-This creates a fundamental tension: **patients who generate this data have no governance over its use, no visibility into its flow, and no participation in the value it creates.**
+Here's what that looks like in practice: **you can't see who accessed your records, you can't control what they do with them, and you certainly don't share in the billions of dollars your data helps generate.**
 
-HAVEN proposes: **patient data sovereignty as infrastructure**.
+Shoshana Zuboff calls this "surveillance capitalism"—human experience extracted as free raw material [18]. Jaron Lanier puts it more bluntly: patients perform valuable labor every time they seek care, but the wealth flows elsewhere [19].
+
+Three centuries ago, John Locke argued that people own the fruits of their labor [20]. If you generate health data through the work of living—managing chronic illness, showing up for appointments, tolerating the indignities of medical care—shouldn't you have some say in what happens to it?
+
+HAVEN starts from a simple premise: **patient sovereignty isn't a feature to add later. It's the foundation.**
 
 ```mermaid
 graph LR
@@ -50,17 +60,34 @@ graph LR
     F --> I[Value quantified]
 ```
 
-HAVEN is not an application. It is a protocol—a set of specifications that enable patient-sovereign health data systems.
+You won't download HAVEN from an app store. It's a protocol—specifications that let different systems work together while keeping patients in control.
 
 ---
 
 ## 2. Why Now
 
-Three forces converge to make patient data sovereignty both possible and urgent.
+Patient data sovereignty has been technically impossible for most of modern healthcare. That changed.
 
-### 2.1 Infrastructure Maturity
+```mermaid
+timeline
+    title The Convergence Window
+    2016 : 21st Century Cures Act
+         : Information blocking prohibited
+    2018 : GDPR takes effect
+         : Data portability becomes law
+    2021 : CMS mandates enforced
+         : Patient API access required
+    2023 : GPT-4 / Med-PaLM 2
+         : Foundation models trained on health data
+    2024 : HIPAA enforcement surge
+         : 22 OCR actions, $50M+ penalties
+    2026 : HAVEN
+         : Infrastructure catches up to rights
+```
 
-The technical foundation now exists:
+### 2.1 The Infrastructure Finally Exists
+
+Ten years ago, building this would have required convincing every hospital to adopt new standards. Today:
 
 | Component | Status | Significance |
 |-----------|--------|--------------|
@@ -75,15 +102,15 @@ Previous attempts failed because infrastructure didn't exist:
 
 The difference now: **standards are mandated, not optional**.
 
-### 2.2 AI Creates Urgency
+### 2.2 AI Isn't Waiting
 
-Foundation models are being trained on health data **now**:
+While we debate patient rights, foundation models are already training on health data:
 
 - **GPT-4** trained on undisclosed medical corpora with no patient consent mechanism [5]
 - **Med-PaLM 2** achieved 86.5% on MedQA, trained on clinical datasets [6]
 - **PubMed** contains 36M+ articles, increasingly used for medical AI training [7]
 
-The global clinical trials market: **$84.54B in 2024**, projected to reach **$158.41B by 2033** [8]. Yet:
+Meanwhile, clinical trials—an $84B industry heading toward $158B by 2033 [8]—are drowning in their own inefficiency:
 
 | Problem | Data |
 |---------|------|
@@ -94,24 +121,24 @@ The global clinical trials market: **$84.54B in 2024**, projected to reach **$15
 
 **The window is closing.** Once models are trained on ungoverned data, provenance is permanently lost.
 
-### 2.3 Regulatory Momentum
+### 2.3 Regulators Are Done Waiting
 
 | Regulation | Year | Impact |
 |------------|------|--------|
 | 21st Century Cures Act | 2016 | Information blocking prohibited; $1M+ penalties |
 | CMS Interoperability Rules | 2021 | Patient access to claims data mandated |
-| GDPR Article 20 | 2018 | Data portability as fundamental right |
-| HIPAA Right of Access | 2019 | 30-day response requirement; OCR enforcement |
+| GDPR Article 20 [17] | 2018 | Data portability as fundamental right |
+| HIPAA Right of Access [16] | 2019 | 30-day response requirement; OCR enforcement |
 
 2024 enforcement: **HHS OCR issued 22 HIPAA enforcement actions**, with over 50 Right of Access penalties since 2019 [13].
 
-Regulators are pushing toward patient control. HAVEN provides the technical infrastructure to implement their intent.
+The legal framework for patient control is arriving faster than the technical infrastructure to support it. HAVEN fills that gap.
 
 ---
 
 ## 3. Related Work
 
-Several approaches exist for patient health data management. HAVEN differs in scope and design philosophy.
+Others have tried to solve this problem. Here's why we think they fell short—and what HAVEN does differently.
 
 | Approach | Focus | HAVEN Differentiation |
 |----------|-------|----------------------|
@@ -122,15 +149,43 @@ Several approaches exist for patient health data management. HAVEN differs in sc
 | **CommonHealth (Android)** | Health data API standard | Device-level API; no consent protocol, no provenance, no value model |
 | **TEFCA/Carequality** | Network-to-network exchange | Institution-centric; patient is not the data controller |
 
-**HAVEN's position**: A protocol layer that combines patient-native governance (like Solid's philosophy) with healthcare-specific standards (FHIR, OMOP) and research-ready infrastructure (consent semantics, quality scoring, contribution tracking).
+#### Capability Comparison
 
-HAVEN is not a platform or application—it is infrastructure that enables platforms to interoperate while preserving patient sovereignty.
+|  | Patient Control | Consent Granularity | Audit Trail | Value Tracking | Health Standards | Research Ready |
+|--|:--:|:--:|:--:|:--:|:--:|:--:|
+| **HAVEN** | ●●●● | ●●●● | ●●●● | ●●●● | ●●●● | ●●●● |
+| Apple Health | ●●○○ | ●○○○ | ●○○○ | ○○○○ | ●●●○ | ○○○○ |
+| PicnicHealth | ●○○○ | ●○○○ | ●●○○ | ●○○○ | ●●●○ | ●●●○ |
+| Ocean Protocol | ●●●○ | ●●○○ | ●●●○ | ●●●○ | ○○○○ | ●○○○ |
+| Solid | ●●●● | ●●○○ | ●●○○ | ○○○○ | ○○○○ | ○○○○ |
+| TEFCA | ●○○○ | ●○○○ | ●●○○ | ○○○○ | ●●●● | ●●○○ |
+
+```mermaid
+quadrantChart
+    title Positioning: Patient Control vs Healthcare Specialization
+    x-axis Low Patient Control --> High Patient Control
+    y-axis Generic Data --> Healthcare Specific
+    quadrant-1 The Goal
+    quadrant-2 Institution-Centric Health
+    quadrant-3 Generic Platforms
+    quadrant-4 Patient-Centric Generic
+    HAVEN: [0.9, 0.9]
+    TEFCA: [0.2, 0.85]
+    Apple Health: [0.5, 0.7]
+    PicnicHealth: [0.3, 0.75]
+    Ocean Protocol: [0.7, 0.2]
+    Solid: [0.85, 0.15]
+```
+
+**Where HAVEN fits**: We took Solid's idea (patients own their data) and made it work for healthcare. That means speaking FHIR and OMOP, handling the weird consent requirements that health data needs, and tracking quality in ways researchers actually care about.
+
+This isn't an app you download. It's plumbing that lets different apps work together without anyone losing control of their data.
 
 ---
 
 ## 4. Problem Statement
 
-HAVEN addresses four structural failures in health data systems:
+Modern health IT solved interoperability. It forgot about the patient. Four failures persist:
 
 | Problem | Description | HAVEN Response |
 |---------|-------------|----------------|
@@ -143,22 +198,36 @@ HAVEN addresses four structural failures in health data systems:
 
 ## 5. Design Principles
 
-Six principles guide HAVEN:
+We made choices. Here's what we believe:
 
-| Principle | Meaning |
-|-----------|---------|
-| **P1: Patient-Native Sovereignty** | Patient control is the foundation, not a feature |
-| **P2: Programmable Governance** | Consent is policy to execute, not form to sign |
-| **P3: Auditable by Default** | Every access creates a record |
-| **P4: Contribution Quantification** | Patient value is measurable |
-| **P5: Regulatory Compatibility** | Enables compliance, doesn't replace it |
-| **P6: Implementation Agnostic** | Protocol works across storage, compute, UI choices |
+**Patient control comes first.** Not as a feature we'll add later, but as the architectural foundation. Everything else follows from this.
+
+**Consent should be code, not paperwork.** A signed form sitting in a filing cabinet doesn't help anyone. Consent needs to be machine-readable, machine-enforceable, and revocable in real-time.
+
+**Every access leaves a trace.** No silent reads. No invisible queries. If someone touches the data, that fact gets recorded.
+
+**Patient value should be measurable.** If data has worth, we should be able to quantify who contributed what.
+
+**Work with regulators, not around them.** HAVEN helps you comply with HIPAA and GDPR. It doesn't replace legal requirements—it makes them easier to meet.
+
+**No technology lock-in.** Use whatever database you want. Deploy wherever you want. The protocol doesn't care.
+
+These aren't novel ideas. Beauchamp and Childress laid out the ethical framework in 1979: **autonomy**, **beneficence**, **non-maleficence**, **justice** [21]. HAVEN just takes those principles and makes them technical requirements:
+
+| HAVEN Principle | Ethical Foundation |
+|-----------------|-------------------|
+| Patient-Native Sovereignty | **Autonomy**: respect for patient self-determination |
+| Auditable by Default | **Non-maleficence**: prevent hidden harms through transparency |
+| Contribution Quantification | **Justice**: fair distribution of benefits and burdens |
+| Regulatory Compatibility | **Beneficence**: enable good outcomes within legal frameworks |
+
+Lawrence Lessig put it simply: "code is law" [22]. The technical choices we make encode values whether we admit it or not. HAVEN explicitly chooses patient sovereignty. It's not a constraint we work around—it's the point.
 
 ---
 
 ## 6. HAVEN Core Protocol
 
-HAVEN defines four primitives. Everything else is implementation choice.
+HAVEN is deliberately minimal. Four primitives, tightly specified. Everything else—how you store data, run computations, handle payments—is your problem to solve.
 
 ```mermaid
 graph TB
@@ -175,9 +244,14 @@ graph TB
     PR --> CM
 ```
 
+**How they connect:**
+- Every **Health Asset** requires a **Consent** reference (no "naked" data)
+- Every **Consent** operation creates a **Provenance** entry (audit trail)
+- **Contribution** calculates value from **Assets** using **Provenance** for attribution
+
 ### 6.1 Health Asset
 
-A **Health Asset** is a governed data reference—not raw data, but a pointer with embedded governance metadata.
+Think of a Health Asset as a "smart pointer" to clinical data. It's not the data itself—it's a reference that carries its own governance rules. You can't touch the underlying data without going through the consent and audit machinery attached to the asset.
 
 #### Specification
 
@@ -189,16 +263,16 @@ HealthAsset := {
     consent_ref     : ConsentID        // Active consent policy
     quality_class   : {A, B, C, D}     // Data quality grade
     provenance_ref  : ProvenanceID     // Audit chain reference
+    patient_ref     : PatientID        // Owner of this data
     created_at      : Timestamp
 }
 ```
 
-#### Properties
+#### What Makes It Work
 
-1. **Governance-embedded**: Never "naked" data. Consent reference is required—enforced at the protocol level.
-2. **Content-addressed**: `asset_id` derived via SHA-256 content hash ensures immutability and enables Merkle tree verification across distributed systems.
-3. **Substrate-agnostic**: Same asset may have FHIR, OMOP, or MEDS representations with semantic equivalence maintained through concept mappings.
-4. **Quality-scored**: Every asset carries a quality classification derived from the three-gate validation protocol.
+You can't create a Health Asset without a consent reference. The protocol rejects it. This isn't a policy choice—it's enforced at the data structure level.
+
+The `asset_id` comes from hashing the content (SHA-256), so if anyone tampers with the data, the ID won't match. Same trick Git uses. The asset can live in FHIR, OMOP, or whatever format your system needs—semantic mappings handle the translation. And every asset gets a quality grade (A through D) based on how well it passes the validation gates.
 
 #### Example
 
@@ -210,6 +284,7 @@ HealthAsset := {
   "consent_ref": "consent:98765",
   "quality_class": "A",
   "provenance_ref": "prov:chain:11111",
+  "patient_ref": "patient:alice-12345",
   "created_at": "2026-01-15T10:30:00Z"
 }
 ```
@@ -218,7 +293,7 @@ HealthAsset := {
 
 ### 6.2 Consent Protocol
 
-The **Consent Protocol** defines how authorization is granted, verified, and revoked.
+Today's consent is a fiction: you sign a 40-page form you didn't read, granting permanent rights you can't revoke, to data uses you'll never know about. HAVEN's Consent Protocol turns consent into something that actually works.
 
 #### Specification
 
@@ -272,66 +347,36 @@ consent:
 
 **What patient sees**: "I'm sharing my labs, conditions, and medications (but not mental health notes) with the Diabetes CGM Study. They can only use it in aggregate with 50+ other patients. This expires in one year. I can revoke anytime."
 
-#### Semantic Guarantees
+#### What the Protocol Guarantees
 
-1. **Deterministic Evaluation**: Same inputs always produce the same authorization decision
-2. **Immediate Revocation**: After `revoke()` is called, all subsequent `verify()` calls return denied
-3. **Closed-World Scope**: Resource types not explicitly granted are denied by default
+Run the same consent check twice with the same inputs—you get the same answer. No randomness, no "it depends." This matters for auditing.
 
-#### PSDL: A Declarative Policy Language
+When a patient revokes consent, it's immediate. Not "within 24 hours" or "after the next sync." The next `verify()` call returns denied. Done.
 
-HAVEN recommends **[PSDL](https://github.com/Chesterguan/PSDL)** (Patient Scenario Definition Language) as the specification language for consent policies and clinical scenarios. PSDL makes authorization logic **human-readable yet machine-executable**.
+And we use closed-world semantics: if you didn't explicitly grant access to a resource type, the answer is no. Silence means denial, not permission.
 
-**Core Properties:**
+#### Why This Matters
 
-| Property | Description |
-|----------|-------------|
-| **Declarative** | Express *what* to detect, not *how* to compute |
-| **Auditable** | Embedded `intent`, `rationale`, and `provenance` |
-| **Deterministic** | Same inputs always produce same results |
-| **Portable** | Same scenario runs on FHIR, OMOP, or other substrates |
+We didn't invent these ideas. After Nazi medical experiments, the Nuremberg Code (1947) established that voluntary consent isn't optional—it's the ethical foundation [23]. The Belmont Report (1979) codified this for modern research [24]. We're just making these principles executable.
 
-**Example: Clinical Scenario for Cohort Matching**
+Helen Nissenbaum's "contextual integrity" framework explains why current consent fails [25]: information that's appropriate in one context (sharing symptoms with your doctor) becomes a violation when it flows to another (that data training an advertising model). HAVEN enforces context. Data shared for research stays in research. Period.
 
-```yaml
-scenario: AKI_Early_Detection
-version: "1.0.0"
+#### PSDL: A Declarative Policy Language (Optional)
 
-audit:
-  intent: "Detect early acute kidney injury using creatinine trends"
-  rationale: "Early AKI detection enables timely intervention"
-  provenance: "KDIGO Clinical Practice Guideline for AKI (2012)"
+HAVEN recommends **[PSDL](https://github.com/Chesterguan/PSDL)** (Patient Scenario Definition Language) for consent policies and clinical scenarios. PSDL is **optional but recommended** for implementations that want human-readable, machine-executable authorization logic.
 
-signals:
-  Cr:
-    ref: creatinine
-    concept_id: 3016723    # OMOP standard concept
-    unit: mg/dL
+**Why PSDL?** Instead of opaque algorithms, patients can understand their consent:
+- *"This shares my lab data with the Diabetes Study"*
+- *"They can only use it in aggregate with 50+ other patients"*
+- *"It's based on the ADA clinical guidelines"*
 
-trends:
-  cr_delta_6h:
-    expr: delta(Cr, 6h)
-    description: "Creatinine change over 6 hours"
-
-logic:
-  aki_risk:
-    when: cr_delta_6h > 0.3 AND last(Cr) > 1.5
-    severity: high
-    description: "Early AKI - creatinine rising and elevated"
-```
-
-**What patients see**: Instead of opaque algorithms, patients can understand:
-- *"This scenario detects early kidney injury"*
-- *"It looks at how my creatinine changes over 6 hours"*
-- *"It's based on the KDIGO 2012 clinical guideline"*
-
-See [Appendix C: PSDL Reference](#appendix-c-psdl-reference) for complete syntax specification.
+Same inputs, same outputs, every time—and you can trace exactly why a decision was made. See [Appendix C: PSDL Reference](#appendix-c-psdl-reference) for how it works.
 
 ---
 
 ### 6.3 Provenance Record
 
-The **Provenance Record** is an append-only audit trail of all governance events.
+Right now, you have no idea who looked at your medical records last Tuesday. The Provenance Record fixes that—an append-only log of every access, every query, every export. Nobody can erase their tracks.
 
 #### Specification
 
@@ -354,12 +399,11 @@ EventType := {
 }
 ```
 
-#### Properties
+#### How It Stays Honest
 
-1. **Append-only**: Entries cannot be modified or deleted—enforced via hash-chain integrity
-2. **Hash-chained**: Each entry references the SHA-256 hash of the previous entry, forming a Merkle-linked audit log similar to blockchain structures but without consensus overhead
-3. **Cryptographically signed**: All entries carry Ed25519 or ECDSA signatures from the acting principal
-4. **Queryable**: Patients can retrieve their complete history via authenticated API with O(log n) verification
+Once an entry goes in, it stays. No edits, no deletions. Each entry includes the hash of the previous one, so tampering with history breaks the chain—you'd have to rewrite everything that came after. (Yes, like a blockchain, but without the consensus theater.)
+
+Every entry gets signed. Ed25519 or ECDSA, take your pick. The signature ties each action to a specific actor, and patients can pull their complete history through an authenticated API. Verification is O(log n)—you don't need to replay the whole chain to check a single entry.
 
 #### Example: Access Log
 
@@ -391,7 +435,7 @@ graph LR
 
 ### 6.4 Contribution Model
 
-The **Contribution Model** quantifies patient data value for fair distribution.
+If patient data has value—and it clearly does, given the billions flowing through the health data economy—then patients should see some of it. The Contribution Model creates the accounting system to make that possible.
 
 #### Specification
 
@@ -434,6 +478,32 @@ graph LR
 | Gate 1: Structure | Required fields, valid codes | Class C/D |
 | Gate 2: Mapping | Standard concepts, research-ready | Class B/C |
 
+#### Quality Score Computation
+
+Each gate contributes to a composite quality score:
+
+```
+QualityScore = G₀ × (w₁·G₁ + w₂·G₂)
+
+Where:
+  G₀ = Provenance gate (binary: 0 or 1)
+  G₁ = Structure completeness (0.0 to 1.0)
+  G₂ = Concept mapping coverage (0.0 to 1.0)
+  w₁ = 0.4 (structure weight)
+  w₂ = 0.6 (mapping weight)
+```
+
+The quality class follows from the score:
+
+| Quality Score | Class | Meaning |
+|---------------|-------|---------|
+| ≥ 0.90 | A | Research-grade, fully mapped |
+| 0.75 – 0.89 | B | Good quality, minor gaps |
+| 0.50 – 0.74 | C | Usable with caveats |
+| < 0.50 | D | Limited utility |
+
+If G₀ = 0 (provenance fails), the asset is rejected entirely—no score assigned.
+
 #### Example: Contribution Calculation
 
 ```
@@ -447,15 +517,23 @@ Contribution Score = TierWeight × QualityScore × VolumeNorm
                    = 0.83
 ```
 
-Specific weights are implementation-defined, allowing adaptation to different research contexts.
+The score (0.0 to 1.0) is a relative weight, not a dollar amount. If Alice scores 0.83 and Bob scores 0.41, Alice contributed roughly twice as much to that study. What that means in actual money? That's between you, your users, and your business model.
+
+The weights we provide are starting points. A genomics study might value COMPLEX tier data differently than a population health survey. Adjust accordingly.
+
+#### The Harder Question: What's Fair?
+
+Dividing value fairly when many people contribute is genuinely hard. Rawls argued that inequalities only make sense if they help the worst-off [26]. In health data terms: patients bear the real risks (privacy, discrimination, insurance consequences). They should share the real benefits.
+
+Elinor Ostrom won a Nobel Prize showing that communities can govern shared resources without either privatizing them or handing them to the state [27]. Patient data fits this model: a **governed commons**. Not locked away (that helps no one). Not extracted freely (that helps everyone but patients). Collectively managed, through consent and transparent accounting.
 
 ---
 
 ## 7. Reference Architecture
 
-HAVEN follows a **compute-to-data** paradigm: raw biomedical data remains under patient or institutional control; queries and models travel to authorized compute environments rather than data traveling out.
+You can build HAVEN-compliant systems many ways: centralized data lakes, federated networks, compute-to-data architectures where queries travel instead of data. We don't care. The protocol specifies the data structures and semantics—how you deploy them is your business.
 
-HAVEN recommends a four-layer architecture. Implementations may vary.
+Here's one way to think about the layers (but don't treat this as gospel):
 
 ```mermaid
 graph TB
@@ -486,6 +564,8 @@ graph TB
 
 ### Data Flow Example
 
+One way this could work (yours might look different—maybe the data stays encrypted and only the patient can unlock it, or queries travel to the data instead of the other way around):
+
 ```mermaid
 sequenceDiagram
     participant P as Patient
@@ -514,12 +594,12 @@ sequenceDiagram
 
 ## 8. Foundations
 
-HAVEN builds on established standards, not from scratch.
+We're not inventing new standards. Healthcare already has too many of those. HAVEN rides on what already works:
 
 | Foundation | Role in HAVEN | Adoption Scale |
 |------------|---------------|----------------|
 | **FHIR R4** | Data exchange format | Mandated by CMS; supported by Epic, Cerner, all major EHRs [14] |
-| **OMOP CDM** | Research data model | 974M patient records across 544 databases in 54 countries [2] |
+| **OMOP CDM** | Research data model | 974M patient records across 544 databases in 54 countries [2][15] |
 | **SMART on FHIR** | Authorization framework | Major EHRs (Epic, Cerner, Allscripts); Apple Health Records integration [1] |
 | **OAuth 2.0 / OIDC** | Authentication | Industry standard; 1B+ daily authentications globally |
 | **Content-addressable storage** | Asset integrity | Proven in Git (100M+ repos), IPFS, blockchain systems |
@@ -537,27 +617,25 @@ HAVEN Health Assets map to FHIR resources including: `Patient`, `Condition`, `Ob
 
 ### Why This Matters
 
-HAVEN is not inventing new data formats or reinventing authentication. By building on proven foundations:
-
-- **Interoperability**: Works with existing health IT infrastructure without requiring system replacement
-- **Credibility**: Based on standards with institutional adoption and regulatory backing
-- **Feasibility**: Implementation requires integration engineering, not breakthrough technology
-- **Network Effects**: Leverages existing OHDSI network of 330+ research databases
+Healthcare doesn't need another proprietary format that forces everyone to rip out their existing systems. HAVEN plugs into what's already there—your Epic instance, your OMOP warehouse, your existing authentication. The standards have institutional buy-in and regulatory backing. You're not waiting for research breakthroughs; this is integration engineering. And with 330+ databases already speaking OMOP, you're not starting from scratch.
 
 ---
 
 ## 9. Implementation Scope
 
-HAVEN explicitly defines what it specifies and what it leaves to implementations.
+We're opinionated about some things and deliberately silent on others. Here's where the line is.
 
 ### HAVEN Specifies
 
 | Component | Specification |
 |-----------|---------------|
-| Health Asset structure | Required fields, content addressing |
-| Consent Protocol | Operations, attestation format, verification |
-| Provenance Record | Event types, chaining, signatures |
-| Contribution Model | Tiers, quality gates, scoring interface |
+| Health Asset structure | Required fields, content addressing, quality grades |
+| Consent Protocol | Operations, attestation format, verification algorithm |
+| Provenance Record | Event types, hash chaining, Merkle proofs |
+| Contribution Model | Tiers, quality gates, value calculation formula |
+| Exchange Bundle | Interoperability format for data transfer |
+
+**Note**: The four primitives (Health Asset, Consent, Provenance, Contribution) form the core protocol. The Exchange Bundle is supporting infrastructure for transferring data between HAVEN-compliant systems.
 
 ### Implementations Decide
 
@@ -569,6 +647,17 @@ HAVEN explicitly defines what it specifies and what it leaves to implementations
 | **User interface** | Mobile app, web, API-only | Not specified |
 | **Payment rails** | Fiat, crypto, points | Implementation choice |
 | **Data ingestion** | Fasten, 1upHealth, direct EHR | Any compliant source |
+| **Encryption** | AES, ChaCha20, etc. | Implementation choice |
+| **Key management** | Custodial, self-sovereign, social recovery | Implementation choice |
+| **Identity verification** | KYC, DID, OAuth, etc. | Implementation choice |
+
+### Economics: Intentionally Open
+
+We know how to measure contribution. We're not going to tell you how to pay for it.
+
+HAVEN provides the accounting: `Value = TierWeight × QualityScore × VolumeNorm`. Reference weights and quality thresholds are in the spec. But payment rails? Marketplace design? Token economics? Those are yours to figure out.
+
+This isn't a cop-out. It's recognition that the right economic model depends on context—academic research, commercial trials, and patient advocacy groups will need different approaches. HAVEN gives them a common language for value; they decide what to do with it.
 
 ### What This Means
 
@@ -577,24 +666,39 @@ A HAVEN-compliant system:
 - ✅ MUST implement Health Asset, Consent, Provenance, Contribution primitives
 - ✅ MUST enforce consent verification before data access
 - ✅ MUST maintain append-only provenance records
+- ✅ MUST support Exchange Bundle format for interoperability
 - ⚪ MAY use any storage, compute, or UI approach
+- ⚪ MAY implement any economic distribution model
 - ⚪ MAY extend the protocol with additional features
+
+### Optional Extensions
+
+- **PSDL** (Patient Scenario Definition Language): Declarative policy language for consent and clinical scenarios. Recommended but not required. See [github.com/Chesterguan/PSDL](https://github.com/Chesterguan/PSDL).
+
+### What We're Not Trying to Do
+
+Scope creep kills protocols. Here's what HAVEN deliberately ignores:
+
+- **Compliance**: HAVEN helps you comply with HIPAA/GDPR. It doesn't replace your lawyers.
+- **Marketplaces**: We measure value. We don't build payment systems.
+- **User interfaces**: How patients and researchers interact? Your problem.
+- **New data formats**: We use FHIR and OMOP. We're not inventing another standard.
+- **Technology choices**: No blockchain requirement. No cloud vendor lock-in. No opinions on your database.
+- **Identity**: How you verify patients are who they say they are is up to you.
 
 ---
 
 ## 10. Conclusion
 
-HAVEN addresses a fundamental asymmetry: patients generate biomedical data but have no governance over its use.
+The deal patients get today is bad: generate the data, bear the risks, see none of the value. HAVEN doesn't fix this through better intentions or tighter regulation. It fixes it through infrastructure.
 
-**The protocol contribution**: Four primitives—Health Asset, Consent Protocol, Provenance Record, Contribution Model—that make patient sovereignty implementable.
+Four primitives. That's the entire protocol: Health Asset, Consent Protocol, Provenance Record, Contribution Model. Enough to make patient sovereignty technically enforceable. Not enough to lock anyone into a particular implementation.
 
-**The timing**: Infrastructure is mature. AI is training. Regulators are pushing. The moment for patient data sovereignty is now.
-
-**The approach**: Build on proven standards (FHIR, OMOP). Specify the essential protocol. Leave implementation choices to adopters.
+The timing matters. FHIR and OMOP are mandated or widely adopted. Foundation models are being trained on health data right now. Regulators are enforcing patient access rights with real penalties. The window for building this infrastructure is open—but it won't stay open forever.
 
 ---
 
-We are building a reference implementation to demonstrate that patient-sovereign biomedical data is practical, not theoretical.
+We're building a reference implementation to prove this works. If you're interested in patient-sovereign health data, reach out.
 
 **Contact**: chesterguan@prometheno.org
 
@@ -635,6 +739,26 @@ We are building a reference implementation to demonstrate that patient-sovereign
 [16] HIPAA Privacy Rule. 45 CFR Part 160 and Part 164.
 
 [17] GDPR. Regulation (EU) 2016/679 of the European Parliament.
+
+[18] Zuboff, S. *The Age of Surveillance Capitalism: The Fight for a Human Future at the New Frontier of Power.* PublicAffairs, 2019.
+
+[19] Lanier, J. *Who Owns the Future?* Simon & Schuster, 2013.
+
+[20] Locke, J. *Two Treatises of Government.* 1689. (Chapter V: "Of Property")
+
+[21] Beauchamp, T.L., and Childress, J.F. *Principles of Biomedical Ethics.* 8th ed., Oxford University Press, 2019. (Originally published 1979)
+
+[22] Lessig, L. *Code: Version 2.0.* Basic Books, 2006.
+
+[23] "The Nuremberg Code." *Trials of War Criminals before the Nuremberg Military Tribunals.* U.S. Government Printing Office, 1949. (Originally issued 1947)
+
+[24] National Commission for the Protection of Human Subjects of Biomedical and Behavioral Research. *The Belmont Report: Ethical Principles and Guidelines for the Protection of Human Subjects of Research.* U.S. Department of Health, Education, and Welfare, 1979.
+
+[25] Nissenbaum, H. "Privacy as Contextual Integrity." *Washington Law Review* 79.1 (2004): 119-158.
+
+[26] Rawls, J. *A Theory of Justice.* Harvard University Press, 1971.
+
+[27] Ostrom, E. *Governing the Commons: The Evolution of Institutions for Collective Action.* Cambridge University Press, 1990.
 
 ---
 
@@ -741,7 +865,7 @@ version: "1.0.0"
 audit:
   intent: "Identify Type 2 Diabetes patients suitable for CGM study"
   rationale: "CGM studies require confirmed T2DM with recent HbA1c data"
-  provenance: "ADA Standards of Medical Care in Diabetes (2024)"
+  provenance: "ADA Standards of Medical Care in Diabetes (2025)"
 
 signals:
   HbA1c:
@@ -828,13 +952,10 @@ evaluate(scenario, patient_data) → {
 }
 ```
 
-**Guarantees:**
-1. **Deterministic**: Same scenario + same data = same result
-2. **Auditable**: Every evaluation creates a provenance entry
-3. **Sandboxed**: Scenarios cannot access data outside declared signals
+**What you can count on:** Run the same scenario against the same data—you'll get the same result every time. Each evaluation leaves a trace in the provenance log. And scenarios can only see what they explicitly declare in their signals block; they can't go fishing through other data.
 
 ---
 
-*HAVEN Protocol Whitepaper v2.0 | January 2026*
+*HAVEN Protocol Whitepaper v2.0 | February 2026*
 
 *This document is released under Creative Commons Attribution 4.0 International (CC BY 4.0).*

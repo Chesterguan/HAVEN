@@ -13,3 +13,15 @@ Thumbs.db
 *.pdf
 _build/
 dist/
+
+# TypeSpec
+typespec/node_modules/
+typespec/package-lock.json
+
+# Generated files (from TypeSpec)
+# Note: We commit generated files for convenience, but they can be regenerated
+# generated/
+
+# Temporary files
+*.tmp
+*.temp

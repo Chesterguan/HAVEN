@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "description": "Valid research consent with conditions",
+    "expected_result": "valid",
+    "spec_reference": "spec/002-consent-protocol.md Section 2.1"
+  },
+  "data": {
+    "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+    "grantor": {
+      "id": "patient:alice-12345",
+      "type": "HAVEN_ID",
+      "verification": "AUTHENTICATED"
+    },
+    "grantee": {
+      "id": "study:diabetes-cgm-2026",
+      "type": "STUDY",
+      "name": "Diabetes CGM Outcomes Study",
+      "organization": "Stanford Medicine",
+      "credentials": [
+        {
+          "type": "IRB_APPROVAL",
+          "id": "IRB-2026-001",
+          "issuer": "stanford.edu"
+        }
+      ]
+    },
+    "scope": {
+      "resourceTypes": ["Observation.laboratory", "Condition", "MedicationRequest"],
+      "exclusions": ["Observation.mental_health", "Note"],
+      "timeRange": {
+        "start": "2020-01-01T00:00:00.000Z",
+        "end": null
+      }
+    },
+    "purpose": ["RESEARCH"],
+    "conditions": [
+      {
+        "type": "AGGREGATION_ONLY",
+        "parameters": {
+          "min_records": 10
+        }
+      },
+      {
+        "type": "MIN_COHORT_SIZE",
+        "parameters": {
+          "minimum": 50
+        }
+      },
+      {
+        "type": "NO_REIDENTIFICATION",
+        "parameters": {
+          "prohibition": "ABSOLUTE"
+        }
+      }
+    ],
+    "granted_at": "2026-01-28T10:30:00.000Z",
+    "expires_at": "2027-01-28T10:30:00.000Z",
+    "status": "ACTIVE",
+    "signature": {
+      "algorithm": "ED25519",
+      "publicKeyId": "did:haven:alice#key-1",
+      "value": "MEUCIQDxSampleSignatureBase64EncodedValueHere",
+      "signedAt": "2026-01-28T10:30:00.000Z"
+    }
+  }
+}

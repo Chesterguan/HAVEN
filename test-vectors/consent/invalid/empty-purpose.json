@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "description": "Consent with empty purpose array (at least one required)",
+    "expected_result": "invalid",
+    "expected_error": "EMPTY_PURPOSE",
+    "spec_reference": "spec/002-consent-protocol.md Section 2.2.5 - At least one purpose MUST be specified"
+  },
+  "data": {
+    "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+    "grantor": {
+      "id": "patient:alice-12345",
+      "type": "HAVEN_ID"
+    },
+    "grantee": {
+      "id": "study:test-study",
+      "type": "STUDY",
+      "name": "Test Study"
+    },
+    "scope": {
+      "resourceTypes": ["Observation"]
+    },
+    "purpose": [],
+    "granted_at": "2026-01-28T10:30:00.000Z",
+    "status": "ACTIVE",
+    "signature": {
+      "algorithm": "ED25519",
+      "publicKeyId": "did:haven:alice#key-1",
+      "value": "MEUCIQDxSampleValue",
+      "signedAt": "2026-01-28T10:30:00.000Z"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "description": "Valid clinical care consent with broad access",
+    "expected_result": "valid",
+    "spec_reference": "spec/002-consent-protocol.md Section 9.2"
+  },
+  "data": {
+    "consent_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "grantor": {
+      "id": "patient:bob-67890",
+      "type": "HAVEN_ID"
+    },
+    "grantee": {
+      "id": "clinician:dr-smith-001",
+      "type": "CLINICIAN",
+      "name": "Dr. Sarah Smith",
+      "organization": "City General Hospital"
+    },
+    "scope": {
+      "resourceTypes": ["*"],
+      "exclusions": []
+    },
+    "purpose": ["TREATMENT"],
+    "conditions": [
+      {
+        "type": "NOTIFICATION_REQUIRED",
+        "parameters": {
+          "notify_on": ["EXPORT"]
+        }
+      }
+    ],
+    "granted_at": "2026-01-15T08:00:00.000Z",
+    "expires_at": null,
+    "status": "ACTIVE",
+    "signature": {
+      "algorithm": "ED25519",
+      "publicKeyId": "did:haven:bob#key-1",
+      "value": "MEYCIQCwSampleSignatureBase64EncodedValueHere",
+      "signedAt": "2026-01-15T08:00:00.000Z"
+    }
+  }
+}

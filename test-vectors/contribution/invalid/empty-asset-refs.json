@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "description": "Contribution with empty asset references (at least one required)",
+    "expected_result": "invalid",
+    "expected_error": "EMPTY_ASSET_REFS",
+    "spec_reference": "spec/004-contribution-model.md Section 2.2.3 - At least one asset MUST be referenced"
+  },
+  "data": {
+    "contributionId": "contrib:ffffffff-ffff-ffff-ffff-ffffffffffff",
+    "patientId": "patient:david-22222",
+    "assetRefs": [],
+    "qualityScore": 0.9,
+    "tier": "PROFILE",
+    "context": {
+      "contextId": "ctx:test-002",
+      "contextType": "COHORT_QUERY",
+      "purpose": "RESEARCH",
+      "timestamp": "2026-01-28T11:00:00.000Z"
+    },
+    "rawValue": 0.2,
+    "timestamp": "2026-01-28T11:00:00.000Z",
+    "provenanceRef": "prov:chain004:entry:5"
+  }
+}

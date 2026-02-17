@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "description": "Contribution with invalid tier value",
+    "expected_result": "invalid",
+    "expected_error": "INVALID_ENUM_VALUE",
+    "spec_reference": "spec/004-contribution-model.md Section 3.1 - MUST be one of PROFILE, STRUCTURED, LONGITUDINAL, COMPLEX"
+  },
+  "data": {
+    "contributionId": "contrib:11111111-1111-1111-1111-111111111111",
+    "patientId": "patient:eve-33333",
+    "assetRefs": [
+      "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+    ],
+    "qualityScore": 0.7,
+    "tier": "SUPER_COMPLEX",
+    "context": {
+      "contextId": "ctx:test-003",
+      "contextType": "RESEARCH_STUDY",
+      "purpose": "RESEARCH",
+      "timestamp": "2026-01-28T12:00:00.000Z"
+    },
+    "rawValue": 0.5,
+    "timestamp": "2026-01-28T12:00:00.000Z",
+    "provenanceRef": "prov:chain005:entry:1"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "description": "Health Asset missing required consent_ref field",
+    "expected_result": "invalid",
+    "expected_error": "MISSING_REQUIRED_FIELD",
+    "spec_reference": "spec/001-health-asset.md Section 2.1 - consent_ref is REQUIRED"
+  },
+  "data": {
+    "asset_id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730",
+    "data_ref": "fhir://ehr.hospital.org/Observation/bp-123",
+    "substrate": "FHIR-R4",
+    "quality_class": "A",
+    "provenance_ref": "prov:chain001:entry:001",
+    "patient_ref": "patient:alice-12345",
+    "created_at": "2026-01-28T10:30:00.000Z"
+  }
+}
