@@ -1,8 +1,12 @@
+<p align="center">
+  <img src="assets/logo.jpeg" alt="HAVEN Logo" width="200"/>
+</p>
+
 # HAVEN Protocol
 
 **Health Asset Value & Exchange Network**
 
-A protocol for patient-sovereign biomedical data.
+A value exchange protocol for patient-controlled health data.
 
 ---
 
@@ -25,6 +29,9 @@ HAVEN builds on established standards (HL7 FHIR R4, OHDSI OMOP CDM) and leaves i
 |----------|-------------|
 | [Whitepaper (English)](docs/WHITEPAPER.md) | Full protocol specification |
 | [Whitepaper (中文)](docs/WHITEPAPER_ZH.md) | 协议规范中文版 |
+| [Whitepaper (Français)](docs/WHITEPAPER_FR.md) | Spécification du protocole |
+| [Implementation Guide](docs/implementation-guide.md) | How to build HAVEN-compliant systems |
+| [Formal Specifications](spec/) | RFC-style specs for each primitive |
 
 ## Related Projects
 
@@ -59,4 +66,4 @@ This work is licensed under [Creative Commons Attribution 4.0 International (CC 
 
 ---
 
-*HAVEN Protocol v2.0 | January 2026*
+*HAVEN Protocol v2.0 | February 2026*

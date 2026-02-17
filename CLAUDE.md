@@ -81,6 +81,8 @@ HAVEN/
 ├── LICENSE                     # CC BY 4.0
 ├── CONTRIBUTING.md             # How to contribute
 ├── CLAUDE.md                   # This file
+├── assets/
+│   └── logo.jpeg               # HAVEN logo
 ├── docs/
 │   ├── WHITEPAPER.md           # Protocol specification (narrative)
 │   ├── WHITEPAPER_ZH.md        # Chinese version
