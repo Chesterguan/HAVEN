@@ -700,7 +700,7 @@ The timing matters. FHIR and OMOP are mandated or widely adopted. Foundation mod
 
 We're building a reference implementation to prove this works. If you're interested in patient-sovereign health data, reach out.
 
-**Contact**: chesterguan@prometheno.org
+**Contact**: chesterfield199512@gmail.com
 
 ---
 

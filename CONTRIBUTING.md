@@ -37,4 +37,4 @@ By contributing, you agree that your contributions will be licensed under CC BY 
 
 ## Contact
 
-Questions? Email chesterguan@prometheno.org
+Questions? Email chesterfield199512@gmail.com

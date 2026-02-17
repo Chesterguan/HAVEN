@@ -61,8 +61,9 @@ This work is licensed under [Creative Commons Attribution 4.0 International (CC 
 
 ## Contact
 
-- **Email**: chesterguan@prometheno.org
-- **Project**: [Prometheno](https://github.com/Prometheno)
+- **Author**: Chester Guan
+- **Email**: chesterfield199512@gmail.com
+- **GitHub**: [github.com/Chesterguan](https://github.com/Chesterguan)
 
 ---
 

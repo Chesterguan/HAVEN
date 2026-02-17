@@ -141,7 +141,7 @@ npm run build   # Generates to ../generated/
 
 ## Contact
 
-- **Email**: chesterguan@prometheno.org
+- **Email**: chesterfield199512@gmail.com
 - **Author**: Chester Guan
 
 ---

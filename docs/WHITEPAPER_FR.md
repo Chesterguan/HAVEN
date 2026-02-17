@@ -700,7 +700,7 @@ Le moment compte. FHIR et OMOP sont imposés ou largement adoptés. Des modèles
 
 Nous construisons une implémentation de référence pour prouver que ça fonctionne. Si les données de santé souveraines par les patients vous intéressent, contactez-nous.
 
-**Contact** : chesterguan@prometheno.org
+**Contact** : chesterfield199512@gmail.com
 
 ---
 

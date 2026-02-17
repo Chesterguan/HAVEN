@@ -700,7 +700,7 @@ HAVEN 提供核算方式：`价值 = 层级权重 × 质量分数 × 数量归�
 
 我们正在构建参考实现，以证明这行得通。如果你对患者主权健康数据感兴趣，欢迎联系。
 
-**联系方式**：chesterguan@prometheno.org
+**联系方式**：chesterfield199512@gmail.com
 
 ---
 
