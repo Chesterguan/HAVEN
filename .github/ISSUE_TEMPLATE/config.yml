@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Protocol Discussion
+    url: https://github.com/Chesterguan/HAVEN/discussions
+    about: Use Discussions for open-ended questions and design conversations that aren't yet an issue.

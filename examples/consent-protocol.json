@@ -1,0 +1,269 @@
+{
+  "_meta": {
+    "description": "Consent Protocol examples — grant, verify, revoke, and edge cases",
+    "spec": "spec/002-consent-protocol.md",
+    "date": "2026-02-18",
+    "version": "2.0.0"
+  },
+
+  "key_semantics": {
+    "closed_world": "If a resource type is not listed in scope.resourceTypes, access is DENIED. Silence = denial.",
+    "immediate_revocation": "Revocation takes effect on the next verify() call. There is no grace period.",
+    "deterministic": "The same consent + same request always produces the same verification result.",
+    "signature_required": "All ConsentAttestations MUST be cryptographically signed by the grantor."
+  },
+
+  "examples": [
+    {
+      "name": "Research study consent — scoped and time-bounded",
+      "description": "Alice grants the Diabetes CGM Study access to labs, conditions, and medications (excluding mental health notes), aggregated only, for one year.",
+      "consent_attestation": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "grantor": {
+          "id": "patient:alice-12345",
+          "type": "HAVEN_ID",
+          "verification": "AUTHENTICATED"
+        },
+        "grantee": {
+          "id": "study:diabetes-cgm-2026",
+          "type": "STUDY",
+          "name": "Diabetes CGM Outcomes Study",
+          "organization": "Stanford Medicine"
+        },
+        "scope": {
+          "resourceTypes": ["Observation.laboratory", "Condition", "MedicationRequest"],
+          "exclusions": ["Observation.mental_health", "DocumentReference.note"],
+          "timeRange": {
+            "start": "2020-01-01T00:00:00.000Z",
+            "end": null
+          }
+        },
+        "purpose": ["RESEARCH"],
+        "conditions": [
+          {
+            "type": "MIN_COHORT_SIZE",
+            "parameters": { "minimum": 50 }
+          },
+          {
+            "type": "NO_REIDENTIFICATION",
+            "parameters": { "prohibition": "ABSOLUTE" }
+          }
+        ],
+        "granted_at": "2026-01-28T10:30:00.000Z",
+        "expires_at": "2027-01-28T10:30:00.000Z",
+        "status": "ACTIVE",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "patient:alice-12345#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-01-28T10:30:00.000Z"
+        }
+      },
+      "plain_language": "I'm sharing my lab results, conditions, and medications (not mental health records) from 2020 onward with the Diabetes CGM Study. They may only use them in aggregate with 50 or more patients and may not re-identify me. This expires in one year. I can revoke at any time."
+    },
+    {
+      "name": "Commercial research consent — restricted reuse",
+      "description": "Bob consents to commercial use of his data by a pharmaceutical company, restricted to cardiovascular research and non-transferable.",
+      "consent_attestation": {
+        "consent_id": "660f9511-f3ac-52e5-b827-557766551111",
+        "grantor": {
+          "id": "patient:bob-67890",
+          "type": "HAVEN_ID",
+          "verification": "AUTHENTICATED"
+        },
+        "grantee": {
+          "id": "org:pfizer-cardiovascular-data",
+          "type": "ORGANIZATION",
+          "name": "Pfizer Cardiovascular Research",
+          "organization": "Pfizer Inc."
+        },
+        "scope": {
+          "resourceTypes": ["Observation.laboratory", "Condition.cardiovascular", "Procedure"],
+          "exclusions": ["Observation.mental_health", "MedicationRequest.psychiatry", "DocumentReference"],
+          "timeRange": {
+            "start": "2018-01-01T00:00:00.000Z",
+            "end": "2026-01-01T00:00:00.000Z"
+          }
+        },
+        "purpose": ["COMMERCIAL_RESEARCH"],
+        "conditions": [
+          {
+            "type": "PURPOSE_RESTRICTED",
+            "parameters": { "allowed_domains": ["cardiovascular", "metabolic"] }
+          },
+          {
+            "type": "NO_TRANSFER",
+            "parameters": { "prohibition": "ABSOLUTE" }
+          },
+          {
+            "type": "MIN_COHORT_SIZE",
+            "parameters": { "minimum": 100 }
+          }
+        ],
+        "granted_at": "2026-02-01T09:00:00.000Z",
+        "expires_at": "2026-12-31T23:59:59.000Z",
+        "status": "ACTIVE",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "patient:bob-67890#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-02-01T09:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "Open-ended public health consent — broad but non-commercial",
+      "description": "Carol grants public health authorities access to all her data for disease surveillance only, with no expiry.",
+      "consent_attestation": {
+        "consent_id": "771a0622-a4bd-63f6-c938-668877662222",
+        "grantor": {
+          "id": "patient:carol-11111",
+          "type": "HAVEN_ID",
+          "verification": "AUTHENTICATED"
+        },
+        "grantee": {
+          "id": "org:cdc-surveillance",
+          "type": "GOVERNMENT",
+          "name": "CDC National Disease Surveillance",
+          "organization": "U.S. Centers for Disease Control and Prevention"
+        },
+        "scope": {
+          "resourceTypes": ["Condition", "Observation", "Immunization", "Encounter"],
+          "exclusions": [],
+          "timeRange": { "start": "2010-01-01T00:00:00.000Z", "end": null }
+        },
+        "purpose": ["PUBLIC_HEALTH"],
+        "conditions": [
+          {
+            "type": "NO_COMMERCIAL_USE",
+            "parameters": { "prohibition": "ABSOLUTE" }
+          },
+          {
+            "type": "AGGREGATE_ONLY",
+            "parameters": { "minimum_cohort": 10 }
+          }
+        ],
+        "granted_at": "2026-02-05T12:00:00.000Z",
+        "expires_at": null,
+        "status": "ACTIVE",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "patient:carol-11111#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-02-05T12:00:00.000Z"
+        }
+      }
+    }
+  ],
+
+  "verification_examples": [
+    {
+      "name": "Authorized access — exact scope match",
+      "request": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "accessor": { "id": "researcher:bob@stanford.edu", "type": "RESEARCHER" },
+        "requested_scope": {
+          "resourceTypes": ["Observation.laboratory"],
+          "timeRange": { "start": "2022-01-01T00:00:00.000Z", "end": null }
+        },
+        "requested_purpose": "RESEARCH",
+        "cohort_size": 127
+      },
+      "result": {
+        "authorized": true,
+        "denial_reasons": []
+      }
+    },
+    {
+      "name": "Denied — requested resource type not in scope (closed-world)",
+      "description": "Researcher requests DiagnosticReport, which is not listed in Alice's consent. Closed-world: silence = denial.",
+      "request": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "accessor": { "id": "researcher:bob@stanford.edu", "type": "RESEARCHER" },
+        "requested_scope": {
+          "resourceTypes": ["DiagnosticReport"]
+        },
+        "requested_purpose": "RESEARCH",
+        "cohort_size": 127
+      },
+      "result": {
+        "authorized": false,
+        "denial_reasons": ["Resource type 'DiagnosticReport' not covered by consent scope"]
+      }
+    },
+    {
+      "name": "Denied — excluded resource type requested",
+      "description": "Requesting mental health observations, which are explicitly excluded.",
+      "request": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "accessor": { "id": "researcher:bob@stanford.edu", "type": "RESEARCHER" },
+        "requested_scope": {
+          "resourceTypes": ["Observation.mental_health"]
+        },
+        "requested_purpose": "RESEARCH",
+        "cohort_size": 127
+      },
+      "result": {
+        "authorized": false,
+        "denial_reasons": ["Resource type 'Observation.mental_health' is explicitly excluded"]
+      }
+    },
+    {
+      "name": "Denied — cohort size below minimum condition",
+      "description": "Consent requires cohort of 50+. Researcher's cohort is only 12.",
+      "request": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "accessor": { "id": "researcher:bob@stanford.edu", "type": "RESEARCHER" },
+        "requested_scope": {
+          "resourceTypes": ["Observation.laboratory"]
+        },
+        "requested_purpose": "RESEARCH",
+        "cohort_size": 12
+      },
+      "result": {
+        "authorized": false,
+        "denial_reasons": ["Condition MIN_COHORT_SIZE not met: cohort_size 12 < required 50"]
+      }
+    },
+    {
+      "name": "Denied — consent revoked",
+      "description": "Alice revoked this consent. Revocation is immediate — the next verify() call returns denied.",
+      "consent_status": "REVOKED",
+      "request": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "accessor": { "id": "researcher:bob@stanford.edu", "type": "RESEARCHER" },
+        "requested_scope": { "resourceTypes": ["Observation.laboratory"] },
+        "requested_purpose": "RESEARCH",
+        "cohort_size": 127
+      },
+      "result": {
+        "authorized": false,
+        "denial_reasons": ["Consent status is REVOKED"]
+      }
+    }
+  ],
+
+  "revocation_example": {
+    "name": "Consent revocation",
+    "description": "Alice revokes her consent. Takes effect immediately — no grace period.",
+    "revoke_request": {
+      "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+      "grantor_id": "patient:alice-12345",
+      "reason": "Patient requested"
+    },
+    "result": {
+      "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+      "previous_status": "ACTIVE",
+      "new_status": "REVOKED",
+      "revoked_at": "2026-03-01T15:00:00.000Z"
+    },
+    "provenance_entry_created": {
+      "event_type": "CONSENT_REVOKED",
+      "details": {
+        "consent_id": "550e8400-e29b-41d4-a716-446655440000",
+        "revoked_at": "2026-03-01T15:00:00.000Z",
+        "reason": "Patient requested"
+      }
+    }
+  }
+}

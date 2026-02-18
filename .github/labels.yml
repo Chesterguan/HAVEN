@@ -1,0 +1,73 @@
+# HAVEN Protocol Issue Labels
+# Apply these labels in GitHub via Settings → Labels, or use the GitHub CLI:
+#   gh label create "spec" --color "0075ca" --description "Relates to a formal specification"
+#
+# Format: name, color (hex without #), description
+
+- name: "spec"
+  color: "0075ca"
+  description: "Relates to a formal specification (spec/*.md)"
+
+- name: "spec:health-asset"
+  color: "0075ca"
+  description: "spec/001-health-asset.md"
+
+- name: "spec:consent"
+  color: "0075ca"
+  description: "spec/002-consent-protocol.md"
+
+- name: "spec:provenance"
+  color: "0075ca"
+  description: "spec/003-provenance-record.md"
+
+- name: "spec:contribution"
+  color: "0075ca"
+  description: "spec/004-contribution-model.md"
+
+- name: "spec:exchange-bundle"
+  color: "0075ca"
+  description: "spec/006-exchange-bundle.md"
+
+- name: "breaking-change"
+  color: "d93f0b"
+  description: "Would invalidate previously valid data structures or change semantics"
+
+- name: "bug"
+  color: "ee0701"
+  description: "Something is incorrect or inconsistent in the repo"
+
+- name: "implementation"
+  color: "0e8a16"
+  description: "Report or question from someone building a HAVEN-compliant system"
+
+- name: "good-first-issue"
+  color: "7057ff"
+  description: "Well-scoped, does not require deep protocol knowledge"
+
+- name: "question"
+  color: "cc317c"
+  description: "A question about the protocol or how to implement it"
+
+- name: "documentation"
+  color: "fef2c0"
+  description: "Improvements to docs, examples, or guides"
+
+- name: "test-vectors"
+  color: "e4e669"
+  description: "Addition or correction of test vector files"
+
+- name: "typespec"
+  color: "bfd4f2"
+  description: "TypeSpec definitions or generated schema"
+
+- name: "needs-triage"
+  color: "ededed"
+  description: "Needs review to determine priority and category"
+
+- name: "needs-discussion"
+  color: "ededed"
+  description: "Requires community discussion before action"
+
+- name: "wont-fix"
+  color: "ffffff"
+  description: "Out of scope or deliberate design decision — will not change"

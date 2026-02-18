@@ -6,58 +6,65 @@
 
 **Health Asset Value & Exchange Network**
 
-A value exchange protocol for patient-controlled health data.
+An independent, open protocol for patient-controlled health data. HAVEN specifies how health data is referenced, consented to, audited, and valued — without prescribing storage, computation, or payment mechanisms.
+
+**License**: [CC BY 4.0](LICENSE) &nbsp;·&nbsp; **Status**: v2.0 Draft &nbsp;·&nbsp; **Not a company. Not a product.**
 
 ---
 
-## Overview
+## The problem
 
-HAVEN defines four core primitives for patient data sovereignty:
+Every blood test and clinical note you generate becomes training data for AI systems you'll never see. You can't audit who accessed your records. You can't set conditions on how your data is used. You don't share in the value your data creates.
 
-| Primitive | Description |
+This isn't a policy failure — it's an infrastructure failure. No standard protocol exists that ties governance to data. HAVEN is that protocol.
+
+---
+
+## Four primitives
+
+| Primitive | What it does |
 |-----------|-------------|
-| **Health Asset** | Content-addressed governed data objects |
-| **Consent Protocol** | Programmable authorization with deterministic evaluation |
-| **Provenance Record** | Hash-chained audit trail |
-| **Contribution Model** | Quality-weighted value quantification |
+| **[Health Asset](spec/001-health-asset.md)** | Content-addressed (SHA-256) reference to governed clinical data. Consent reference is structurally required — no ungoverned assets. |
+| **[Consent Protocol](spec/002-consent-protocol.md)** | Machine-executable, granular, immediately revocable authorization. Closed-world: silence = denial. |
+| **[Provenance Record](spec/003-provenance-record.md)** | Append-only, hash-chained, Ed25519-signed audit trail. Every access logged. Tamper-evident. |
+| **[Contribution Model](spec/004-contribution-model.md)** | 3-gate quality protocol + tier-weighted value score. Measures what patient data contributes to a study. |
 
-HAVEN builds on established standards (HL7 FHIR R4, OHDSI OMOP CDM) and leaves implementation choices to adopters.
+HAVEN builds on FHIR R4 and OMOP CDM — standards already mandated or widely adopted. It does **not** specify storage, encryption, key management, identity, or payment rails.
+
+---
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [Whitepaper (English)](docs/WHITEPAPER.md) | Full protocol specification |
+| [Whitepaper (English)](docs/WHITEPAPER.md) | Protocol overview, design rationale, full references |
 | [Whitepaper (中文)](docs/WHITEPAPER_ZH.md) | 协议规范中文版 |
 | [Whitepaper (Français)](docs/WHITEPAPER_FR.md) | Spécification du protocole |
-| [Implementation Guide](docs/implementation-guide.md) | How to build HAVEN-compliant systems |
-| [Formal Specifications](spec/) | RFC-style specs for each primitive |
+| [Implementation Guide](docs/implementation-guide.md) | How to build HAVEN-compliant systems (with code) |
+| [Formal Specifications](spec/) | RFC-style specs — MUST/SHOULD/MAY requirements |
+| [Examples](examples/) | Annotated examples for each primitive |
+| [Test Vectors](test-vectors/) | Conformance test data (valid + invalid cases) |
 
-## Related Projects
+---
 
-- **[PSDL](https://github.com/Chesterguan/PSDL)** - Patient Scenario Definition Language, the recommended policy language for HAVEN
+## Contributing
 
-## Core Principles
+HAVEN is an independent open protocol. There is no company. The spec improves through use, critique, and real-world implementation experience.
 
-1. **Patient-Native Sovereignty** - Patient control is the foundation, not a feature
-2. **Programmable Governance** - Consent is policy to execute, not form to sign
-3. **Auditable by Default** - Every access creates a record
-4. **Contribution Quantification** - Patient value is measurable
-5. **Regulatory Compatibility** - Enables compliance, doesn't replace it
-6. **Implementation Agnostic** - Protocol works across storage, compute, UI choices
+**Most valuable right now:**
+- Adversarial spec review — find ambiguities, edge cases, contradictions
+- Implementation reports — try to build something; tell us where the spec failed you
+- Test vector additions — especially boundary conditions and multi-primitive scenarios
 
-## Standards
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute effectively, and [ROADMAP.md](ROADMAP.md) for what's open and what's planned.
 
-HAVEN builds on:
+---
 
-- **FHIR R4** - Data exchange format
-- **OMOP CDM** - Research data model
-- **SMART on FHIR** - Authorization framework
-- **OAuth 2.0 / OIDC** - Authentication
+## Related projects
 
-## License
+- **[PSDL](https://github.com/Chesterguan/PSDL)** — Patient Scenario Definition Language. Declarative policy language for HAVEN consent and clinical scenarios. Recommended but not required.
 
-This work is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE).
+---
 
 ## Contact
 
@@ -67,4 +74,4 @@ This work is licensed under [Creative Commons Attribution 4.0 International (CC 
 
 ---
 
-*HAVEN Protocol v2.0 | February 2026*
+*HAVEN Protocol v2.0 | February 2026 | CC BY 4.0*

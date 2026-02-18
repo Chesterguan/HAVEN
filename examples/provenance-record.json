@@ -1,0 +1,190 @@
+{
+  "_meta": {
+    "description": "Provenance Record examples — hash chain construction, event types, Merkle proof",
+    "spec": "spec/003-provenance-record.md",
+    "date": "2026-02-18",
+    "version": "2.0.0"
+  },
+
+  "key_properties": {
+    "append_only": "Entries cannot be modified or deleted. Once written, the record stands.",
+    "hash_chained": "Each entry includes previous_hash — the hash of the prior entry. Tampering with any entry breaks all subsequent hashes.",
+    "signed": "Each entry is signed by the actor using Ed25519 or ECDSA. The signature ties the action to a specific key.",
+    "first_entry": "The first entry in a chain has previous_hash: null. All subsequent entries must have a non-null previous_hash.",
+    "verification": "O(log n) via Merkle proofs. You don't need to replay the full chain to verify a single entry."
+  },
+
+  "event_types": {
+    "ASSET_CREATED": "A Health Asset was created",
+    "ASSET_ACCESSED": "A Health Asset was read",
+    "ASSET_EXPORTED": "A Health Asset was exported out of the system",
+    "CONSENT_GRANTED": "A consent attestation was created",
+    "CONSENT_VERIFIED": "A consent check was performed (pass or fail)",
+    "CONSENT_REVOKED": "A consent was revoked by the grantor",
+    "QUERY_EXECUTED": "A query was run against health data",
+    "COMPUTATION_RUN": "A computation was executed against health data",
+    "CONTRIBUTION_RECORDED": "A contribution was calculated and recorded"
+  },
+
+  "example_chain": {
+    "description": "A complete provenance chain for patient Alice — from account creation through consent grant, data access, and contribution recording. Each entry's previous_hash links to the prior entry's entry_hash.",
+    "chain_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "entries": [
+      {
+        "entry_id": "prov:chain001:entry:0",
+        "chain_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "sequence": 0,
+        "timestamp": "2026-01-28T10:00:00.000Z",
+        "event_type": "SYSTEM_AUDIT",
+        "actor": { "id": "system:haven", "type": "SYSTEM" },
+        "subject": { "type": "PATIENT", "id": "patient:alice-12345" },
+        "details": { "event": "CHAIN_CREATED" },
+        "previous_hash": null,
+        "entry_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "system:haven#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-01-28T10:00:00.000Z"
+        }
+      },
+      {
+        "entry_id": "prov:chain001:entry:1",
+        "chain_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "sequence": 1,
+        "timestamp": "2026-01-28T10:01:00.000Z",
+        "event_type": "ASSET_CREATED",
+        "actor": { "id": "system:ingestion", "type": "SYSTEM" },
+        "subject": {
+          "type": "HEALTH_ASSET",
+          "id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"
+        },
+        "details": {
+          "substrate": "FHIR-R4",
+          "quality_class": "A",
+          "patient_ref": "patient:alice-12345",
+          "record_count": 847
+        },
+        "previous_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "entry_hash": "sha256:1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "system:ingestion#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-01-28T10:01:00.000Z"
+        }
+      },
+      {
+        "entry_id": "prov:chain001:entry:2",
+        "chain_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "sequence": 2,
+        "timestamp": "2026-01-28T10:30:00.000Z",
+        "event_type": "CONSENT_GRANTED",
+        "actor": { "id": "patient:alice-12345", "type": "PATIENT" },
+        "subject": {
+          "type": "CONSENT_ATTESTATION",
+          "id": "consent:550e8400-e29b-41d4-a716-446655440000"
+        },
+        "details": {
+          "grantee": "study:diabetes-cgm-2026",
+          "purpose": "RESEARCH",
+          "expires_at": "2027-01-28T10:30:00.000Z",
+          "scope_summary": "Observation.laboratory, Condition, MedicationRequest (2020-present)"
+        },
+        "previous_hash": "sha256:1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+        "entry_hash": "sha256:2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "patient:alice-12345#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-01-28T10:30:00.000Z"
+        }
+      },
+      {
+        "entry_id": "prov:chain001:entry:3",
+        "chain_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "sequence": 3,
+        "timestamp": "2026-01-28T14:00:00.000Z",
+        "event_type": "CONSENT_VERIFIED",
+        "actor": { "id": "researcher:bob@stanford.edu", "type": "RESEARCHER" },
+        "subject": {
+          "type": "CONSENT_ATTESTATION",
+          "id": "consent:550e8400-e29b-41d4-a716-446655440000"
+        },
+        "details": {
+          "authorized": true,
+          "requested_scope": ["Observation.laboratory"],
+          "requested_purpose": "RESEARCH",
+          "cohort_size": 127
+        },
+        "previous_hash": "sha256:2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c",
+        "entry_hash": "sha256:3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "system:haven#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-01-28T14:00:00.000Z"
+        }
+      },
+      {
+        "entry_id": "prov:chain001:entry:4",
+        "chain_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+        "sequence": 4,
+        "timestamp": "2026-01-28T14:00:05.000Z",
+        "event_type": "ASSET_ACCESSED",
+        "actor": { "id": "researcher:bob@stanford.edu", "type": "RESEARCHER" },
+        "subject": {
+          "type": "HEALTH_ASSET",
+          "id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"
+        },
+        "details": {
+          "consent_ref": "consent:550e8400-e29b-41d4-a716-446655440000",
+          "access_type": "READ",
+          "purpose": "RESEARCH",
+          "fields_accessed": ["Observation.laboratory"]
+        },
+        "previous_hash": "sha256:3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d",
+        "entry_hash": "sha256:4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e",
+        "signature": {
+          "algorithm": "ED25519",
+          "public_key_id": "system:haven#key-1",
+          "value": "<base64url-encoded signature>",
+          "signed_at": "2026-01-28T14:00:05.000Z"
+        }
+      }
+    ]
+  },
+
+  "merkle_proof_example": {
+    "description": "Merkle proof for entry:3 (CONSENT_VERIFIED) in a 5-entry chain. Allows O(log n) verification without replaying the full chain.",
+    "entry_id": "prov:chain001:entry:3",
+    "proof": {
+      "root_hash": "sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234",
+      "leaf_index": 3,
+      "path": [
+        { "hash": "sha256:4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e", "position": "RIGHT" },
+        { "hash": "sha256:9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b", "position": "LEFT" },
+        { "hash": "sha256:1122334455667788990011223344556677889900112233445566778899001122", "position": "RIGHT" }
+      ],
+      "tree_size": 5
+    },
+    "verification_steps": [
+      "1. Hash entry:3 data → leaf_hash",
+      "2. Combine with RIGHT sibling (entry:4) → parent hash",
+      "3. Combine with LEFT uncle → grandparent hash",
+      "4. Combine with RIGHT great-uncle → root",
+      "5. Compare computed root with stored root_hash → VALID"
+    ]
+  },
+
+  "tamper_detection_example": {
+    "description": "What happens when an entry is tampered with. The hash chain breaks — all subsequent entries have an invalid previous_hash.",
+    "scenario": "An attacker modifies entry:2 (CONSENT_GRANTED) to change the grantee.",
+    "result": {
+      "modified_entry": "prov:chain001:entry:2",
+      "broken_from": "prov:chain001:entry:3",
+      "detection": "entry:3.previous_hash no longer matches the hash of the modified entry:2",
+      "consequence": "The entire chain from entry:3 onward fails integrity verification"
+    }
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "description": "Health Asset examples — FHIR and OMOP substrates, all quality classes",
+    "spec": "spec/001-health-asset.md",
+    "date": "2026-02-18",
+    "version": "2.0.0"
+  },
+
+  "note": "asset_id is computed as sha256(<canonical JSON of all other fields, keys sorted>). See spec §3.1 and the implementation guide for the exact algorithm.",
+
+  "examples": [
+    {
+      "name": "Class A — FHIR R4 laboratory observations",
+      "description": "A high-quality asset backed by FHIR R4. Passed all three quality gates. Suitable for research use without caveats.",
+      "asset": {
+        "asset_id": "sha256:7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730",
+        "data_ref": "fhir://ehr.hospital.org/Bundle/labs-alice-2023-2026",
+        "substrate": "FHIR-R4",
+        "consent_ref": "consent:550e8400-e29b-41d4-a716-446655440000",
+        "quality_class": "A",
+        "provenance_ref": "prov:chain001:entry:1",
+        "patient_ref": "patient:alice-12345",
+        "created_at": "2026-01-15T10:00:00.000Z",
+        "metadata": {
+          "dataType": "LABORATORY",
+          "recordCount": 847,
+          "timeRange": {
+            "start": "2023-01-01T00:00:00.000Z",
+            "end": "2026-01-15T00:00:00.000Z"
+          },
+          "sourceSystem": "epic-mychart",
+          "qualityDetail": {
+            "gate0_provenance": true,
+            "gate1_structure": 0.98,
+            "gate2_mapping": 0.95,
+            "composite": 0.97
+          }
+        }
+      }
+    },
+    {
+      "name": "Class A — OMOP CDM measurement records",
+      "description": "Asset backed by OMOP CDM v6.0. OMOP concept IDs are fully resolved, making this directly usable in federated research networks.",
+      "asset": {
+        "asset_id": "sha256:a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2",
+        "data_ref": "omop://person/98765/measurement/20230101-20260115",
+        "substrate": "OMOP-CDM-6.0",
+        "consent_ref": "consent:550e8400-e29b-41d4-a716-446655440000",
+        "quality_class": "A",
+        "provenance_ref": "prov:chain002:entry:1",
+        "patient_ref": "patient:alice-12345",
+        "created_at": "2026-01-15T10:05:00.000Z",
+        "metadata": {
+          "dataType": "LABORATORY",
+          "recordCount": 847,
+          "omopConceptIds": [3004410, 3004501, 3006923],
+          "vocabularies": ["LOINC", "SNOMED-CT"],
+          "qualityDetail": {
+            "gate0_provenance": true,
+            "gate1_structure": 0.99,
+            "gate2_mapping": 0.97,
+            "composite": 0.98
+          }
+        }
+      }
+    },
+    {
+      "name": "Class B — Labs with minor mapping gaps",
+      "description": "Structurally complete but some lab codes could not be mapped to OMOP standard concepts. Usable for research with awareness of the gap.",
+      "asset": {
+        "asset_id": "sha256:b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5",
+        "data_ref": "fhir://ehr.clinic.org/Bundle/labs-bob-2024",
+        "substrate": "FHIR-R4",
+        "consent_ref": "consent:660f9511-f3ac-52e5-b827-557766551111",
+        "quality_class": "B",
+        "provenance_ref": "prov:chain003:entry:1",
+        "patient_ref": "patient:bob-67890",
+        "created_at": "2026-01-20T09:00:00.000Z",
+        "metadata": {
+          "dataType": "LABORATORY",
+          "recordCount": 234,
+          "qualityDetail": {
+            "gate0_provenance": true,
+            "gate1_structure": 0.96,
+            "gate2_mapping": 0.78,
+            "composite": 0.83,
+            "unmapped_codes": ["L99-4567", "L99-8901"]
+          }
+        }
+      }
+    },
+    {
+      "name": "Class C — Structured but incomplete records",
+      "description": "Gate 0 and Gate 1 passed but structure completeness is below the B threshold. Usable with caveats — missing required fields in ~30% of records.",
+      "asset": {
+        "asset_id": "sha256:c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+        "data_ref": "fhir://legacy.ehr.org/Bundle/conditions-carol-2022",
+        "substrate": "FHIR-R4",
+        "consent_ref": "consent:771a0622-a4bd-63f6-c938-668877662222",
+        "quality_class": "C",
+        "provenance_ref": "prov:chain004:entry:1",
+        "patient_ref": "patient:carol-11111",
+        "created_at": "2026-01-22T14:00:00.000Z",
+        "metadata": {
+          "dataType": "CONDITIONS",
+          "recordCount": 89,
+          "qualityDetail": {
+            "gate0_provenance": true,
+            "gate1_structure": 0.68,
+            "gate2_mapping": null,
+            "composite": 0.68,
+            "missing_fields": ["onset_date", "severity"]
+          }
+        }
+      }
+    },
+    {
+      "name": "Complex tier — Genomic data asset",
+      "description": "Whole-genome sequencing result. COMPLEX tier because of data type. Class A quality. This tier carries the highest contribution weight.",
+      "asset": {
+        "asset_id": "sha256:d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+        "data_ref": "ga4gh://datasets/WGS/patient-dave-33333/variant-calls-v1",
+        "substrate": "GA4GH-DRS",
+        "consent_ref": "consent:882b1733-b5ce-74a7-d049-779988773333",
+        "quality_class": "A",
+        "provenance_ref": "prov:chain005:entry:1",
+        "patient_ref": "patient:dave-33333",
+        "created_at": "2026-02-01T08:00:00.000Z",
+        "metadata": {
+          "dataType": "GENOMIC",
+          "sequencingType": "WGS",
+          "coverage": "30x",
+          "qualityDetail": {
+            "gate0_provenance": true,
+            "gate1_structure": 0.99,
+            "gate2_mapping": 0.96,
+            "composite": 0.97
+          }
+        }
+      }
+    }
+  ],
+
+  "invalid_examples": [
+    {
+      "name": "INVALID — missing consent_ref",
+      "description": "A Health Asset MUST have a consent_ref. This is rejected by the protocol — there is no such thing as an ungoverned asset.",
+      "error": "MISSING_CONSENT_REF",
+      "asset": {
+        "asset_id": "sha256:invalid000000000000000000000000000000000000000000000000000000000000",
+        "data_ref": "fhir://ehr.hospital.org/Bundle/labs-eve-99999",
+        "substrate": "FHIR-R4",
+        "quality_class": "A",
+        "provenance_ref": "prov:chain999:entry:1",
+        "patient_ref": "patient:eve-99999",
+        "created_at": "2026-02-01T00:00:00.000Z"
+      }
+    },
+    {
+      "name": "INVALID — malformed asset_id",
+      "description": "asset_id MUST match sha256:<64 lowercase hex chars>. This does not.",
+      "error": "INVALID_ASSET_ID_FORMAT",
+      "asset": {
+        "asset_id": "md5:abcdef1234",
+        "data_ref": "fhir://ehr.hospital.org/Bundle/labs-frank-44444",
+        "substrate": "FHIR-R4",
+        "consent_ref": "consent:993c2844-c6df-85b8-e15a-880099884444",
+        "quality_class": "A",
+        "provenance_ref": "prov:chain006:entry:1",
+        "patient_ref": "patient:frank-44444",
+        "created_at": "2026-02-01T00:00:00.000Z"
+      }
+    }
+  ]
+}

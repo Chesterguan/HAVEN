@@ -1,0 +1,194 @@
+{
+  "_meta": {
+    "description": "Contribution Model examples — quality gates, tier weights, value calculation",
+    "spec": "spec/004-contribution-model.md",
+    "date": "2026-02-18",
+    "version": "2.0.0"
+  },
+
+  "formula": {
+    "expression": "ContributionValue = TierWeight × QualityScore × VolumeNorm × ContextMultiplier",
+    "cap": "Result is capped at 1.0",
+    "note": "ContributionValue is a relative weight (0.0–1.0), not a currency amount. Actual compensation is an implementation decision."
+  },
+
+  "tier_weights": {
+    "PROFILE": 0.25,
+    "STRUCTURED": 0.50,
+    "LONGITUDINAL": 0.75,
+    "COMPLEX": 1.00,
+    "note": "These are reference defaults. Implementations may adjust weights based on study-specific requirements."
+  },
+
+  "context_multipliers": {
+    "RESEARCH_STUDY": 1.0,
+    "COHORT_QUERY": 0.5,
+    "AGGREGATE_ANALYSIS": 0.3,
+    "MODEL_TRAINING": 1.5,
+    "MODEL_INFERENCE": 0.2,
+    "QUALITY_MEASURE": 0.4,
+    "PUBLIC_HEALTH": 0.1
+  },
+
+  "quality_gates": {
+    "gate_0_provenance": {
+      "description": "Is the data from a verifiable source? Is the hash intact?",
+      "result": "Binary — pass or fail. If Gate 0 fails, the asset is rejected entirely. No quality class assigned.",
+      "checks": ["Source system is registered and trusted", "asset_id hash matches computed hash of content"]
+    },
+    "gate_1_structure": {
+      "description": "Are required FHIR/OMOP fields present and valid?",
+      "result": "Score 0.0–1.0. If < threshold, quality class is C or D.",
+      "checks": ["Required fields populated", "Coded values use valid code systems", "Timestamps are valid ISO 8601"]
+    },
+    "gate_2_mapping": {
+      "description": "Are clinical codes mapped to OMOP standard concepts?",
+      "result": "Score 0.0–1.0. Determines A vs B when Gate 1 passes.",
+      "checks": ["ICD-10 codes mapped to SNOMED-CT via OMOP vocabulary", "Lab codes mapped to LOINC", "Medications mapped to RxNorm"]
+    },
+    "quality_score_formula": "QualityScore = G0 × (0.4 × G1 + 0.6 × G2)",
+    "quality_classes": {
+      "A": "Score ≥ 0.90 — research-grade, fully mapped",
+      "B": "Score 0.75–0.89 — good quality, minor gaps",
+      "C": "Score 0.50–0.74 — usable with caveats",
+      "D": "Score < 0.50 — limited utility"
+    }
+  },
+
+  "volume_normalization": {
+    "formula": "VolumeNorm = min(1.0, log2(1 + recordCount) / log2(1 + referenceCount))",
+    "reference_count_default": 1000,
+    "note": "Logarithmic normalization — diminishing returns at high volumes. Reference count can be adjusted per study context."
+  },
+
+  "calculation_examples": [
+    {
+      "name": "Alice — Longitudinal lab data, research study",
+      "scenario": "3 years of lab data contributing to a diabetes CGM study",
+      "inputs": {
+        "tier": "LONGITUDINAL",
+        "quality_class": "A",
+        "quality_score": 0.97,
+        "record_count": 847,
+        "context_type": "RESEARCH_STUDY"
+      },
+      "calculation": {
+        "tier_weight": 0.75,
+        "quality_score": 0.97,
+        "volume_norm": "log2(1+847) / log2(1+1000) = 9.73 / 9.97 = 0.976",
+        "context_multiplier": 1.0,
+        "raw_value": "0.75 × 0.97 × 0.976 × 1.0 = 0.710",
+        "final_value": 0.710
+      },
+      "contribution": {
+        "contribution_id": "contrib:alice-study001",
+        "patient_id": "patient:alice-12345",
+        "tier": "LONGITUDINAL",
+        "quality_score": 0.97,
+        "raw_value": 0.710,
+        "context": {
+          "context_type": "RESEARCH_STUDY",
+          "study_ref": "study:diabetes-cgm-2026"
+        },
+        "timestamp": "2026-01-28T14:30:00.000Z"
+      }
+    },
+    {
+      "name": "Bob — Structured labs, cohort query",
+      "scenario": "2 years of lab data in a cohort query (lower context multiplier)",
+      "inputs": {
+        "tier": "STRUCTURED",
+        "quality_class": "B",
+        "quality_score": 0.83,
+        "record_count": 234,
+        "context_type": "COHORT_QUERY"
+      },
+      "calculation": {
+        "tier_weight": 0.50,
+        "quality_score": 0.83,
+        "volume_norm": "log2(1+234) / log2(1+1000) = 7.88 / 9.97 = 0.790",
+        "context_multiplier": 0.5,
+        "raw_value": "0.50 × 0.83 × 0.790 × 0.5 = 0.164",
+        "final_value": 0.164
+      }
+    },
+    {
+      "name": "Dave — Complex genomic data, AI model training",
+      "scenario": "Whole-genome sequencing used for AI model training — highest tier and highest multiplier",
+      "inputs": {
+        "tier": "COMPLEX",
+        "quality_class": "A",
+        "quality_score": 0.97,
+        "record_count": 1,
+        "context_type": "MODEL_TRAINING"
+      },
+      "calculation": {
+        "tier_weight": 1.00,
+        "quality_score": 0.97,
+        "volume_norm": "log2(1+1) / log2(1+1000) = 1.0 / 9.97 = 0.100",
+        "context_multiplier": 1.5,
+        "raw_value": "1.00 × 0.97 × 0.100 × 1.5 = 0.146",
+        "final_value": 0.146,
+        "note": "Even a single genomic record has meaningful contribution — but volume normalization prevents a single record from dominating relative scoring."
+      }
+    },
+    {
+      "name": "Relative comparison — same study, different patients",
+      "description": "In a study with multiple contributors, contribution values are relative weights, not absolute amounts. If Alice scored 0.710 and Bob scored 0.164, Alice contributed ~4.3x more than Bob to this study.",
+      "contributions": [
+        { "patient": "Alice", "tier": "LONGITUDINAL", "quality_class": "A", "value": 0.710 },
+        { "patient": "Bob", "tier": "STRUCTURED", "quality_class": "B", "value": 0.164 },
+        { "patient": "Carol", "tier": "STRUCTURED", "quality_class": "C", "value": 0.089 }
+      ],
+      "total": 0.963,
+      "relative_shares": {
+        "Alice": "73.7%",
+        "Bob": "17.0%",
+        "Carol": "9.2%"
+      }
+    }
+  ],
+
+  "quality_gate_examples": [
+    {
+      "name": "Gate 0 failure — rejected entirely",
+      "description": "Data from an unverified source. No quality class assigned, asset rejected.",
+      "gates": {
+        "gate_0": { "passed": false, "reason": "Source system not registered" },
+        "gate_1": "NOT_EVALUATED",
+        "gate_2": "NOT_EVALUATED"
+      },
+      "result": { "accepted": false, "quality_class": null }
+    },
+    {
+      "name": "Gate 0 pass, Gate 1 fail — Class D",
+      "description": "Valid source but structural completeness below 50%.",
+      "gates": {
+        "gate_0": { "passed": true },
+        "gate_1": { "score": 0.42, "passed": false },
+        "gate_2": "NOT_EVALUATED"
+      },
+      "result": {
+        "accepted": true,
+        "quality_class": "D",
+        "quality_score": 0.42,
+        "note": "Low utility. Most research protocols will filter out Class D."
+      }
+    },
+    {
+      "name": "All gates pass — Class A",
+      "description": "Valid source, complete structure, fully mapped to OMOP standard concepts.",
+      "gates": {
+        "gate_0": { "passed": true },
+        "gate_1": { "score": 0.98 },
+        "gate_2": { "score": 0.95 }
+      },
+      "quality_score_calculation": "1 × (0.4 × 0.98 + 0.6 × 0.95) = 1 × (0.392 + 0.570) = 0.962",
+      "result": {
+        "accepted": true,
+        "quality_class": "A",
+        "quality_score": 0.962
+      }
+    }
+  ]
+}
