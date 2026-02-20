@@ -1,6 +1,6 @@
 # HAVEN: A Value Exchange Protocol for Patient Health Data
 
-**Version 2.0 | February 2026**
+**Version 2.0 | February 2026** &nbsp;·&nbsp; **DOI**: [10.5281/zenodo.18701303](https://doi.org/10.5281/zenodo.18701303)
 
 ---
 

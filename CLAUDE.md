@@ -1,10 +1,12 @@
 # HAVEN Protocol - Project Memory
 
-**Last Updated**: February 17, 2026
+**Last Updated**: February 20, 2026
 
 ## What This Is
 
 HAVEN (Health Asset Value & Exchange Network) is a **value exchange protocol** for patient-controlled health data. It defines how health data is referenced, consented, audited, and valued—without prescribing storage, computation, or payment mechanisms.
+
+**DOI**: [10.5281/zenodo.18701303](https://doi.org/10.5281/zenodo.18701303)
 
 **Core positioning**: Value Exchange Protocol for Health Data (not a platform, not a complete system)
 

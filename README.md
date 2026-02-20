@@ -8,6 +8,8 @@
 
 An independent, open protocol for patient-controlled health data. HAVEN specifies how health data is referenced, consented to, audited, and valued — without prescribing storage, computation, or payment mechanisms.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18701303.svg)](https://doi.org/10.5281/zenodo.18701303)
+
 **License**: [CC BY 4.0](LICENSE) &nbsp;·&nbsp; **Status**: v2.0 Draft &nbsp;·&nbsp; **Not a company. Not a product.**
 
 ---
@@ -33,10 +35,17 @@ HAVEN builds on FHIR R4 and OMOP CDM — standards already mandated or widely ad
 
 ---
 
+## Citation
+
+If you use or reference HAVEN in academic work, please cite:
+
+> Guan, Z., & Qiande, M. (2026). *HAVEN: A Value Exchange Protocol for Patient-Controlled Health Data.* Zenodo. [https://doi.org/10.5281/zenodo.18701303](https://doi.org/10.5281/zenodo.18701303)
+
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
+| [Academic Paper](docs/HAVEN_ARXIV_PAPER.md) | Formal protocol specification with proofs and analysis ([DOI: 10.5281/zenodo.18701303](https://doi.org/10.5281/zenodo.18701303)) |
 | [Whitepaper (English)](docs/WHITEPAPER.md) | Protocol overview, design rationale, full references |
 | [Whitepaper (中文)](docs/WHITEPAPER_ZH.md) | 协议规范中文版 |
 | [Whitepaper (Français)](docs/WHITEPAPER_FR.md) | Spécification du protocole |
