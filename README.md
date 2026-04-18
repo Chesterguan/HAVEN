@@ -72,6 +72,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute effectively, and [R
 ## Related projects
 
 - **[PSDL](https://github.com/Chesterguan/PSDL)** — Patient Scenario Definition Language. Declarative policy language for HAVEN consent and clinical scenarios. Recommended but not required.
+- **[Prometheno](https://prometheno.org)** — Reference implementation of HAVEN for patient-governed medical research.
 
 ---
 
